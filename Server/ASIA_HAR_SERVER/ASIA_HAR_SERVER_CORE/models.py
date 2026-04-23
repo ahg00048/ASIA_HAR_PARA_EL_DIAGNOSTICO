@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class PatientSensorData(models.Model):
@@ -13,8 +14,5 @@ class Patient(models.Model):
     sensorData = models.ForeignKey(PatientSensorData, on_delete=models.CASCADE)
 
 
-class User(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField(primary_key=True, max_length=100)
-    password = models.CharField(max_length=255)
+class User(AbstractUser):
     patientsAssigned = models.ForeignKey(Patient, null=True, on_delete=models.SET_NULL)
