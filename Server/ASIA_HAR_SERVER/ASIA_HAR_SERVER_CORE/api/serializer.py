@@ -5,11 +5,11 @@ from ASIA_HAR_SERVER_CORE.models import Patient
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = '__all__' # not password
+        model = User    
+        fields = ['name', 'first_name', 'last_name', 'email'] 
 
 
 class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
-        fields = '__all__'
+        fields = ['first_name', 'last_name', 'idCard', 'homeId']
