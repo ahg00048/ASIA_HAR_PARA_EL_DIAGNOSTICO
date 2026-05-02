@@ -2,16 +2,7 @@ from django.db import models
 
 # Create your models here.
 class PatientSensorData(models.Model):
-    id = models.IntegerField(primary_key=True)
-    path = models.CharField(max_length=100)
-
-
-class Patient(models.Model):
-    first_name = models.CharField(db_default="first_name" ,max_length=100)
-    last_name = models.CharField(db_default="last_name" ,max_length=100)
-    idCard = models.CharField(primary_key=True, max_length=10)
-    homeId = models.PositiveIntegerField()
-    sensorData = models.ForeignKey(PatientSensorData, null=True, on_delete=models.SET_NULL)
+    path = models.CharField(max_length=100) # SOLO EL DIR
 
 
 class User(models.Model):
@@ -21,4 +12,12 @@ class User(models.Model):
     email = models.EmailField(max_length=100)
     password = models.CharField(db_default="password", max_length=256)
     admin = models.BooleanField(db_default=False)
-    patientsAssigned = models.ForeignKey(Patient, null=True, on_delete=models.SET_NULL)
+
+
+class Patient(models.Model):
+    first_name = models.CharField(db_default="first_name" ,max_length=100)
+    last_name = models.CharField(db_default="last_name" ,max_length=100)
+    card_id = models.CharField(max_length=10)
+    home_id = models.PositiveIntegerField()
+    sensor_data = models.ForeignKey(PatientSensorData, null=True, on_delete=models.SET_NULL)
+    users_assigned = models.ManyToManyField(User)
