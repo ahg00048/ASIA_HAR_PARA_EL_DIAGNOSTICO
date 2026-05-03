@@ -52,6 +52,10 @@ def deleteUser(request, userId): # Body -> current user | query param -> email o
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    patients = Patient.objects.filter(users_assigned__id=userToDel.id)
+    for p in patients:
+        p.users_assigned.remove(userToDel)
+
     userToDel.delete()
     
     try:
@@ -84,10 +88,6 @@ def modifyUser(request, userId): # Body -> current user
         user = User.objects.get(id=userId)
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-    # check password
-
-    #
 
     serializer = UserSerializer(user, data=request.data)
     if serializer.is_valid():
