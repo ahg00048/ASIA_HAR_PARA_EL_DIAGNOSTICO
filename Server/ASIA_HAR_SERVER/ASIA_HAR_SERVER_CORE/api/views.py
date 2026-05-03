@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password
 
 
 # models and serializers
@@ -38,7 +39,7 @@ def deleteUser(request, userId): # Body -> current user | query param -> email o
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if (not user.admin and user.email != request.data.get('email')):
+    if (not user.admin and user.email != request.query_params.get('email_to_del')):
         return Response(status=status.HTTP_403_FORBIDDEN)
     
     try:
@@ -59,13 +60,17 @@ def deleteUser(request, userId): # Body -> current user | query param -> email o
 
 
 def addUser(request): # Body -> current user 
-    if User.objects.filter(email=request.data.get('email')).count != 0:
+    # check if user is created properly (password checks etc)
+
+    #
+    if User.objects.filter(email=request.data.get('email')).count() != 0:
         return Response(status=status.HTTP_409_CONFLICT) 
 
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -75,13 +80,11 @@ def modifyUser(request, userId): # Body -> current user
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    user.password = make_password(request.query_params.get('new_password'))
-    # checks 
+    # check password
 
     #
-    user.save()
 
-    serializer = UserSerializer(user)
+    serializer = UserSerializer(user, data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
     
@@ -93,9 +96,9 @@ def login(request): # query param -> email and password
         user = User.objects.get(email=request.query_params.get('email'))
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    password = make_password(request.query_params.get('password'))
+    password = request.query_params.get('password')
     
-    if password != user.password:
+    if not check_password(password, user.password):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
     
     serializer = UserSerializer(user)
