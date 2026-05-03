@@ -3,6 +3,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.contrib.auth.hashers import make_password
 
 
 # models and serializers
@@ -31,51 +32,102 @@ class PatientViewSet(viewsets.ModelViewSet):
 
 # =========================== Users ===========================
 
-def deleteUser(request, userId):
+def deleteUser(request, userId): # Body -> current user | query param -> email of user to del
     try:
-        user = User.objects.get(userId)
+        user = User.objects.get(id=userId)
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    return Response()
+    if (not user.admin and user.email != request.data.get('email')):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        userToDel = User.objects.get(email=request.query_params.get('email_to_del'))
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    userToDel.delete()
+    
+    try:
+        user = User.objects.get(id=userId)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_200_OK)
+
+    serializer = UserSerializer(user)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-def addUser(request):
-    pass
+def addUser(request): # Body -> current user 
+    if User.objects.filter(email=request.data.get('email')).count != 0:
+        return Response(status=status.HTTP_409_CONFLICT) 
+
+    serializer = UserSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def modifyUser(request):
-    pass
+def modifyUser(request, userId): # Body -> current user 
+    try:
+        user = User.objects.get(id=userId)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    user.password = make_password(request.query_params.get('new_password'))
+    # checks 
+
+    #
+    user.save()
+
+    serializer = UserSerializer(user)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+    
+    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
-def login(request):
-    pass
+def login(request): # query param -> email and password
+    try:
+        user = User.objects.get(email=request.query_params.get('email'))
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    password = make_password(request.query_params.get('password'))
+    
+    if password != user.password:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
+    serializer = UserSerializer(user)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+    
 
 # =========================== Patients ===========================
 
 def addPatient(request, userId):
-    pass
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 def getPatients(request, userId):
-    pass
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 def removePatient(request, userId, patientId):
-    pass
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 def getPatientData(request, userId, patientId):
-    pass
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 def modifyPatient(request, userId, patientId):
-    pass
+    return Response(status=status.HTTP_404_NOT_FOUND)
 
 # =========================== Example Patient Data ===========================
 
 def getExamplePatientData(request, userId, patientId):
-    pass
+    return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 '''
 ======================================================================
@@ -86,42 +138,42 @@ def getExamplePatientData(request, userId, patientId):
 # =========================== Users ===========================
 
 @api_view(['GET', 'POST'])
-def User_Get_Or_Create(request):
+def User_Get_Or_Create(request, format=None):
     if request.method == 'GET':
-        login(request)
+        return login(request)
     elif request.method == 'POST':
-        addUser(request)
+        return addUser(request)
 
 
 @api_view(['PUT', 'DELETE'])
-def User_Delete_Or_Modify(request, id):
+def User_Delete_Or_Modify(request, userId, format=None):
     if request.method == 'PUT':
-        modifyUser(request, id)
+        return modifyUser(request, userId)
     elif request.method == 'DELETE':
-        deleteUser(request, id)
+        return deleteUser(request, userId)
 
 # =========================== Patients ===========================
 
 @api_view(['GET', 'POST'])
-def Patients_Get_All_Or_Add(request, id):
+def Patients_Get_All_Or_Add(request, userId, format=None):
     if request.method == 'GET':
-        getPatients(request, id)
+        return getPatients(request, userId)
     elif request.method == 'POST':
-        addPatient(request, id)
+        return addPatient(request, userId)
 
 
 @api_view(['GET', 'DELETE', 'PUT'])
-def Patients_Get_SensorData_Or_Delete_Or_Add_Or_Modify(request, userId, patientId):
+def Patients_Get_SensorData_Or_Delete_Or_Add_Or_Modify(request, userId, patientId, format=None):
     if request.method == 'GET':
-        getPatientData(request, userId, patientId)
+        return getPatientData(request, userId, patientId)
     elif request.method == 'DELETE':
-        removePatient(request, userId, patientId)
+        return removePatient(request, userId, patientId)
     elif request.method == 'PUT':
-        modifyPatient(request, userId, patientId)
+        return modifyPatient(request, userId, patientId)
 
 # ============== BASIC / JUST TO RESUME DESKTOP DEV ==============
 
 @api_view(['GET'])
-def Get_Example_Patient_Data(request, userEmail, patientId):
-    pass
+def Get_Example_Patient_Data(request, format=None):
+    return getExamplePatientData()
     
