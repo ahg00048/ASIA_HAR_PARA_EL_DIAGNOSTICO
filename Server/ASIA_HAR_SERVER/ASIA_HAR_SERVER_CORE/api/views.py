@@ -3,15 +3,20 @@ from rest_framework.parsers import JSONParser
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.hashers import check_password
-
+from django.http import StreamingHttpResponse
+from wsgiref.util import FileWrapper
 
 # models and serializers
 from ASIA_HAR_SERVER_CORE.models import User
 from ASIA_HAR_SERVER_CORE.models import Patient
 from ASIA_HAR_SERVER_CORE.api.serializer import UserSerializer
 from ASIA_HAR_SERVER_CORE.api.serializer import PatientSerializer
+
+# extra
+from ASIA_HAR_SERVER_CORE.fileDataPersistence.core import *  
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -85,10 +90,11 @@ def modifyUser(request, userId): # Body -> current user
     #
 
     serializer = UserSerializer(user, data=request.data)
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
     
-    return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+    return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 def login(request): # query param -> email and password
@@ -108,28 +114,108 @@ def login(request): # query param -> email and password
 # =========================== Patients ===========================
 
 def addPatient(request, userId):
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    try:
+        user = User.objects.get(id=userId)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+        
+    try:
+        patient = Patient.objects.get(card_id=request.data.get('card_id'))
+    except Patient.DoesNotExist:
+        serializer = PatientSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            # add user assign
+            patient = Patient.objects.get(card_id=request.data.get('card_id'))
+            patient.users_assigned.add(user)
+            #
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    patient.users_assigned.add(user)
+    patient.save()
+
+    return Response(status=status.HTTP_202_ACCEPTED)
 
 
 def getPatients(request, userId):
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    try:
+        user = User.objects.get(id=userId)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+        
+    patients = Patient.objects.filter(users_assigned__id=userId)
+    serialier = PatientSerializer(patients, many=True)
+    return Response(serialier.data, status=status.HTTP_200_OK)
 
 
 def removePatient(request, userId, patientId):
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    try:
+        user = User.objects.get(id=userId)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+        
+    try:
+        patient = Patient.objects.get(id=patientId)
+    except Patient.DoesNotExist:
+        Response(status=status.HTTP_404_NOT_FOUND)
 
+    patient.users_assigned.remove(user)
 
-def getPatientData(request, userId, patientId):
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    if patient.users_assigned.count() == 0:
+        patient.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    return Response(status=status.HTTP_202_ACCEPTED)
 
 
 def modifyPatient(request, userId, patientId):
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    try:
+        user = User.objects.get(id=userId)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        patient = Patient.objects.get(id=patientId)
+    except Patient.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serializer = PatientSerializer(patient, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+    
+    return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+
+def getPatientData(request, userId, patientId):
+    return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
 
 # =========================== Example Patient Data ===========================
 
-def getExamplePatientData(request, userId, patientId):
-    return Response(status=status.HTTP_404_NOT_FOUND)
+def getExamplePatientData(request):
+    house_id = request.query_params.get('house_id')
+    
+    filePaths = retrieveDataPathsFromHouseID_Test(house_id)
+    if len(filePaths) == 0:
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    if not isDataCompressed(house_id):
+        compressFiles(filePaths, house_id)
+
+    dataPath = getCompressedDataPath(house_id)
+    file = open(dataPath, 'rb')
+
+    response = StreamingHttpResponse(
+        FileWrapper(file),
+        content_type="application/zip",
+    )
+
+    response['Content-Disposition'] = 'attachment; filename=house_{0}.zip'.format(house_id)
+
+    return response
 
 
 '''
@@ -178,5 +264,5 @@ def Patients_Get_SensorData_Or_Delete_Or_Add_Or_Modify(request, userId, patientI
 
 @api_view(['GET'])
 def Get_Example_Patient_Data(request, format=None):
-    return getExamplePatientData()
+    return getExamplePatientData(request)
     
