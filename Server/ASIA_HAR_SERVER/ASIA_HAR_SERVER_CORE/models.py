@@ -6,7 +6,7 @@ class PatientSensorData(models.Model):
 
 
 class User(models.Model):
-    name = models.CharField(db_default="username" ,max_length=100)
+    username = models.CharField(db_default="username" ,max_length=100)
     first_name = models.CharField(db_default="first_name" ,max_length=100)
     last_name = models.CharField(db_default="last_name" ,max_length=100)
     email = models.EmailField(max_length=100, unique=True)
