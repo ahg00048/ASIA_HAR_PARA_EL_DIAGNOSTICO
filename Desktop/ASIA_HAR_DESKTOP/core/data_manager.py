@@ -75,9 +75,7 @@ def cullDataFromRecentTimeRange(data_frames, time_range_in_seconds):
                 begin_index = mid_index
             else:
                 end_index = mid_index
-        df.drop(index=df.index[1:mid_index], inplace=True)
-
-    return data_frames
+        df.drop(index=df.index[:mid_index], inplace=True)
 
 
 # Obtiene los datos de ejemplo
@@ -89,7 +87,6 @@ def retrieveDataExample():
     zip_filename = retrieveRemoteData_Zip(url, house_id)
     data_frames = retrieveLocalData_Zip(zip_filename)
     cullDataFromRecentTimeRange(data_frames, 86400)
-
     removeLocalData_Zip(zip_filename)
 
 
