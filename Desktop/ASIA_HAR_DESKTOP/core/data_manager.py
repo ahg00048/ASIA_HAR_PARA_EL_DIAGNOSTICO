@@ -47,7 +47,7 @@ def retrieveLocalData_Zip(path):
 
 
 # Eliminar el zip descargado con la api
-def removeLocalData_Zip(path):
+def removeLocalData(path):
     if not os.path.exists(path) or path == INVALID_PATH:
         return
 
@@ -87,7 +87,4 @@ def retrieveDataExample():
     zip_filename = retrieveRemoteData_Zip(url, house_id)
     data_frames = retrieveLocalData_Zip(zip_filename)
     cullDataFromRecentTimeRange(data_frames, 86400)
-    removeLocalData_Zip(zip_filename)
-
-
-retrieveDataExample()
+    removeLocalData(zip_filename)

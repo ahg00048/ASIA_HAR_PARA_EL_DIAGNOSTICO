@@ -1,6 +1,6 @@
 from criteria import *
 
-class alternative_rel:
+class Alternative_rel:
     weight = 1
     crit = None
     alt = None
@@ -20,7 +20,7 @@ class alternative_rel:
 
 # alternative ---------------------------------------------------
 
-class alternative:
+class Alternative:
     name = ""
     __alternative_relations = []
 
@@ -31,7 +31,7 @@ class alternative:
 
     def addAlternativeRel_Self(self, crit):
         if not any((rel.alt == self and rel.crit == crit) for rel in self.__alternative_relations):
-            self.__alternative_relations.append(alternative_rel(crit, self))
+            self.__alternative_relations.append(Alternative_rel(crit, self))
 
     def addAlternativeRel_AltRel(self, alt_rel):
         if self.__alternative_relations.count(alt_rel) == 0:
@@ -39,7 +39,7 @@ class alternative:
 
     def addAlternativeRel_alt(self, crit, alt, weight):
         if not any((rel.alt == alt and rel.crit == crit) for rel in self.__alternative_relations):
-            self.__alternative_relations.append(alternative_rel(crit, alt, weight))
+            self.__alternative_relations.append(Alternative_rel(crit, alt, weight))
 
 # Eliminar relaciones entre criterios
 
@@ -84,10 +84,10 @@ class alternative:
 
 # funciones
 
-def relateAlternatives(crit: criteria, alt_one: alternative, alt_two: alternative, w_two_by_one: float):
+def relateAlternatives(crit: Criteria, alt_one: Alternative, alt_two: Alternative, w_two_by_one: float):
     alt_one.addAlternativeRel_alt(crit, alt_two, w_two_by_one)
     alt_two.addAlternativeRel_alt(crit, alt_one, 1 / w_two_by_one)
 
-def unrelateAlternatives(crit: criteria, alt_one: alternative, alt_two: alternative):
+def unrelateAlternatives(crit: Criteria, alt_one: Alternative, alt_two: Alternative):
     alt_one.rmAlternativeRel_alt(crit, alt_two)
     alt_two.rmAlternativeRel_alt(crit, alt_one, 1)

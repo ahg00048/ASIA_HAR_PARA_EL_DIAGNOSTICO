@@ -1,4 +1,4 @@
-class criteria_rel:
+class Criteria_rel:
     weight = 1
     crit = None
 
@@ -15,13 +15,13 @@ class criteria_rel:
 
 # criteria ---------------------------------------------------
 
-class criteria:
+class Criteria:
     name = ""
     __criteria_relations = []
 
     def __init__(self, name):
         self.name = name
-        self.__criteria_relations.append(criteria_rel(self))
+        self.__criteria_relations.append(Criteria_rel(self))
 
 # añadir relaciones entre criterios
 
@@ -31,7 +31,7 @@ class criteria:
 
     def addCriteriaRel_Crit(self, crit, weight):
         if not any(rel.crit == crit for rel in self.__criteria_relations):
-            self.__criteria_relations.append(criteria_rel(crit, weight))
+            self.__criteria_relations.append(Criteria_rel(crit, weight))
 
 # Eliminar relaciones entre criterios
 
@@ -75,10 +75,10 @@ class criteria:
 
 # funciones
 
-def relateCriterias(crit_one: criteria, crit_two: criteria, w_two_by_one: float):
+def relateCriterias(crit_one: Criteria, crit_two: Criteria, w_two_by_one: float):
     crit_one.addCriteriaRel_Crit(crit_two, w_two_by_one)
     crit_two.addCriteriaRel_Crit(crit_one, 1 / w_two_by_one)
 
-def unrelateCriterias(crit_one: criteria, crit_two: criteria):
+def unrelateCriterias(crit_one: Criteria, crit_two: Criteria):
     crit_one.rmCriteriaRel_Crit(crit_two)
     crit_two.rmCriteriaRel_Crit(crit_one)
