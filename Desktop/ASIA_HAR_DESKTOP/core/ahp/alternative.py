@@ -1,4 +1,4 @@
-from criteria import *
+from ASIA_HAR_DESKTOP.core.ahp.criteria import *
 
 class Alternative_rel:
     weight = 1
