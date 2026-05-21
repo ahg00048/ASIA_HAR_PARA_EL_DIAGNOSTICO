@@ -43,6 +43,7 @@ def retrieveLocalData_Zip(path):
     data_frames = {text_file.filename : pd.read_csv(zip_f.open(text_file.filename)) 
             for text_file in zip_f.infolist() if text_file.filename.endswith('.csv')}
 
+    print(data_frames)
     return data_frames
 
 
@@ -54,37 +55,13 @@ def removeLocalData(path):
     os.remove(path)
 
 
-# Recorta los archovos de los sensores para que se encuentren en el margen mas reciente de tiempo dado
-def cullDataFromRecentTimeRange(data_frames, time_range_in_seconds):
-    col_label = 'timestamp'
-    for key in data_frames.keys():
-        df = data_frames[key]
-
-        begin_index = 1
-        end_index = len(df.index)
-        last_timestamp = int(df.at[len(df.index) - 1, col_label])
-        desired_timestamp = last_timestamp - time_range_in_seconds
-
-        while begin_index <= end_index:
-            mid_index = int((end_index + begin_index) / 2)
-            
-            if mid_index == end_index or mid_index == begin_index:
-                break
-
-            if int(df.at[mid_index, col_label]) <= desired_timestamp:
-                begin_index = mid_index
-            else:
-                end_index = mid_index
-        df.drop(index=df.index[:mid_index], inplace=True)
-
-
 # Obtiene los datos de ejemplo
 def retrieveDataExample():
     house_id = 2
-    url = url_api_root + url_example + '?house_id={0}'
-    url = url.format(house_id)
+    url = url_api_root + url_example + '?house_id={0}&time_range_in_seconds={1}'
+    url = url.format(house_id, 86400)
 
     zip_filename = retrieveRemoteData_Zip(url, house_id)
-    data_frames = retrieveLocalData_Zip(zip_filename)
-    cullDataFromRecentTimeRange(data_frames, 86400)
+    print(zip_filename)
+    dfs = retrieveLocalData_Zip(zip_filename)
     removeLocalData(zip_filename)

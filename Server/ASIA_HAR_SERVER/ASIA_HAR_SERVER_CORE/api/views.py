@@ -196,17 +196,17 @@ def getPatientData(request, userId, patientId):
 # =========================== Example Patient Data ===========================
 
 def getExamplePatientData(request):
-    house_id = request.query_params.get('house_id')
+    house_id = int(request.query_params.get('house_id'))
+    time_range_in_seconds = int(request.query_params.get('time_range_in_seconds'))
     
-    filePaths = retrieveDataPathsFromHouseID_Test(house_id)
-    if len(filePaths) == 0:
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    if not isDataCompressed(house_id):
-        compressFiles(filePaths, house_id)
+    if house_id is None or time_range_in_seconds is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    dataPath = getCompressedDataPath(house_id)
-    file = open(dataPath, 'rb')
+    try:
+        dataPath = retrieveData_Test(house_id, time_range_in_seconds)
+        file = open(dataPath, 'rb')
+    except BaseException:
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     response = StreamingHttpResponse(
         FileWrapper(file),

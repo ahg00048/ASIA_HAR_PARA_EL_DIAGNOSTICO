@@ -1,12 +1,16 @@
 from ASIA_HAR_SERVER.settings import BASE_DIR
 
 DATASETS_FILE_EXTENSION = 'csv'
+TEMP_DIR = 'temp'
 
 DATASETS = {
     'DIR': BASE_DIR / 'ASIA_HAR_DATASETS_ROOT',
-    'SUBDIRS_FORMAT': '',
-    'FILES_FORMAT': [
-
+    'SUBDIRS_FORMAT': 'house_',
+     'FILES_FORMAT': [ # data_{house_id}.extension
+        'data_',
+        'data_band_',
+        'data_rssi_',
+        'data_temp&humidity_',
     ]
 }
 
