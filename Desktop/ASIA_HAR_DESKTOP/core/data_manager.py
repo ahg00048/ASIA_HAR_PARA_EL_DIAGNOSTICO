@@ -1,4 +1,4 @@
-from settings import * 
+from ASIA_HAR_DESKTOP.core.config import * 
 import os
 import pandas as pd
 import numpy as np
@@ -64,4 +64,4 @@ def retrieveDataExample():
     zip_filename = retrieveRemoteData_Zip(url, house_id)
     print(zip_filename)
     dfs = retrieveLocalData_Zip(zip_filename)
-    removeLocalData(zip_filename)
+    removeLocalData(zip_filename)   
