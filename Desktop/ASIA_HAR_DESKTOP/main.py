@@ -12,5 +12,6 @@ if __name__ == "__main__":
     criterios = ["Temperatura", "Costo", "Durabilidad"]
     
     alt_widget = widget_alternativesTable.Widget_AlternativesTable(criterios)
+    alt_widget = widget_criteriaTable.Widget_CriteriaTable()
     alt_widget.show()
     sys.exit(app.exec())

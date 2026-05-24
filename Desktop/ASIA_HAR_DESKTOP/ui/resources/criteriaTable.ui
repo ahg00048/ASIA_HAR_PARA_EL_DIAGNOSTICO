@@ -1,23 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CriteriaTableWidget</class>
- <widget class="QWidget" name="CriteriaTableWidget">
+ <class>Widget_CriteriaTableWidget</class>
+ <widget class="QWidget" name="Widget_CriteriaTableWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>460</width>
-    <height>380</height>
+    <width>520</width>
+    <height>420</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Matriz de criterios AHP</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QWidget {
+        background-color: #F5FCFC;
+        font-family: "Segoe UI", "Roboto", sans-serif;
+        font-size: 14px;
+        color: #2C3E50;
+    }
+    QLabel#titleLabel {
+        font-size: 18px;
+        font-weight: bold;
+        color: #1C7C7C;
+        padding: 8px;
+    }
+    QTableWidget {
+        background-color: #FFFFFF;
+        border: 1px solid #B2DFDB;
+        border-radius: 6px;
+        gridline-color: #E0F2F1;
+        selection-background-color: #B2DFDB;
+        selection-color: #004D40;
+    }
+    QHeaderView::section {
+        background-color: #E0F2F1;
+        color: #00695C;
+        padding: 6px;
+        border: 1px solid #B2DFDB;
+        border-radius: 0px;
+        font-weight: bold;
+    }
+    QPushButton {
+        background-color: #26A69A;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-weight: bold;
+    }
+    QPushButton:hover {
+        background-color: #00897B;
+    }
+    QPushButton:pressed {
+        background-color: #00796B;
+    }
+   </string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>12</number>
+   </property>
+   <property name="leftMargin">
+    <number>20</number>
+   </property>
+   <property name="topMargin">
+    <number>20</number>
+   </property>
+   <property name="rightMargin">
+    <number>20</number>
+   </property>
+   <property name="bottomMargin">
+    <number>20</number>
+   </property>
    <item>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="titleLabel">
      <property name="text">
-      <string>Matriz de comparación por pares (AHP)</string>
+      <string>Matriz de comparación por pares (Criterios)</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -123,17 +184,20 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>12</number>
+     </property>
      <item>
       <widget class="QPushButton" name="addCriterionButton">
        <property name="text">
-        <string>Agregar criterio</string>
+        <string>+ Agregar criterio</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="removeCriterionButton">
        <property name="text">
-        <string>Eliminar criterio</string>
+        <string>– Eliminar criterio</string>
        </property>
       </widget>
      </item>

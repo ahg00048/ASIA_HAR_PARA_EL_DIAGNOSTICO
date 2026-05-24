@@ -1,19 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AlternativesTableWidget</class>
- <widget class="QWidget" name="AlternativesTableWidget">
+ <class>Widget_AlternativesTableWidget</class>
+ <widget class="QWidget" name="Widget_AlternativesTableWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>450</height>
+    <width>560</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Matrices de alternativas por criterio</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QWidget {
+        background-color: #F5FCFC;
+        font-family: "Segoe UI", "Roboto", sans-serif;
+        font-size: 14px;
+        color: #2C3E50;
+    }
+    QLabel#titleLabel {
+        font-size: 18px;
+        font-weight: bold;
+        color: #1C7C7C;
+        padding: 8px;
+    }
+    QScrollArea {
+        border: none;
+        background-color: transparent;
+    }
+    QGroupBox {
+        background-color: #FFFFFF;
+        border: 1px solid #B2DFDB;
+        border-radius: 8px;
+        margin-top: 12px;
+        padding-top: 16px;
+        font-weight: bold;
+        color: #00695C;
+    }
+    QGroupBox::title {
+        subcontrol-origin: margin;
+        subcontrol-position: top left;
+        padding: 4px 12px;
+        background-color: #E0F2F1;
+        border-radius: 4px;
+        color: #004D40;
+    }
+    QTableWidget {
+        background-color: #FFFFFF;
+        border: 1px solid #B2DFDB;
+        border-radius: 4px;
+        gridline-color: #E0F2F1;
+        selection-background-color: #B2DFDB;
+        selection-color: #004D40;
+    }
+    QHeaderView::section {
+        background-color: #E0F2F1;
+        color: #00695C;
+        padding: 6px;
+        border: 1px solid #B2DFDB;
+        font-weight: bold;
+    }
+    QPushButton {
+        background-color: #26A69A;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-weight: bold;
+    }
+    QPushButton:hover {
+        background-color: #00897B;
+    }
+    QPushButton:pressed {
+        background-color: #00796B;
+    }
+   </string>
+  </property>
   <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>12</number>
+   </property>
+   <property name="leftMargin">
+    <number>20</number>
+   </property>
+   <property name="topMargin">
+    <number>20</number>
+   </property>
+   <property name="rightMargin">
+    <number>20</number>
+   </property>
+   <property name="bottomMargin">
+    <number>20</number>
+   </property>
    <item>
     <widget class="QLabel" name="titleLabel">
      <property name="text">
@@ -34,27 +115,34 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>478</width>
+        <width>518</width>
         <height>300</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="criteriaLayout"/>
+      <layout class="QVBoxLayout" name="criteriaLayout">
+       <property name="spacing">
+        <number>12</number>
+       </property>
+      </layout>
      </widget>
     </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="buttonsLayout">
+     <property name="spacing">
+      <number>12</number>
+     </property>
      <item>
       <widget class="QPushButton" name="addAlternativeButton">
        <property name="text">
-        <string>Agregar alternativa</string>
+        <string>+ Agregar alternativa</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="removeAlternativeButton">
        <property name="text">
-        <string>Eliminar alternativa</string>
+        <string>– Eliminar alternativa</string>
        </property>
       </widget>
      </item>
