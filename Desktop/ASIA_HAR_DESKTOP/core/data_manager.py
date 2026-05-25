@@ -37,7 +37,7 @@ def retrieveRemoteData_Zip(url, house_id):
 
 
 # Obtiene el los archivos csv del zip en el sistema de archivos local
-def retrieveLocalData_Zip(path):
+def retrieveDataFrames_Zip(path):
     zip_f = ZipFile(path)
 
     data_frames = {text_file.filename : pd.read_csv(zip_f.open(text_file.filename)) 
@@ -55,6 +55,14 @@ def removeLocalData(path):
     os.remove(path)
 
 
+def retrieveLocalData(path):
+    pass
+
+
+def saveData(path, data):
+    pass
+
+
 # Obtiene los datos de ejemplo
 def retrieveDataExample():
     house_id = 2
@@ -63,5 +71,5 @@ def retrieveDataExample():
 
     zip_filename = retrieveRemoteData_Zip(url, house_id)
     print(zip_filename)
-    dfs = retrieveLocalData_Zip(zip_filename)
+    dfs = retrieveDataFrames_Zip(zip_filename)
     removeLocalData(zip_filename)   

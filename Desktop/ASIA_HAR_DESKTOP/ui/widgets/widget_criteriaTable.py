@@ -3,7 +3,7 @@ from PyQt6 import uic
 
 from ui.config import *
 
-class Widget_CriteriaTable(QWidget):
+class CriteriaTable(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi(RESOURCES_DIR / "criteriaTable.ui", self)

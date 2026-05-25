@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
 from PyQt6 import uic
 from ui.config import *
 
-class Widget_AlternativesTable(QWidget):
+class AlternativesTable(QWidget):
     """
     Widget que contiene, para cada criterio, una tabla de comparación por pares
     de las alternativas. Permite añadir/eliminar alternativas y renombrarlas.
