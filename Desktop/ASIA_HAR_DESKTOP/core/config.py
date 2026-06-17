@@ -24,11 +24,16 @@ PATIENTS_GET_POST: int = 2
 PATIENTS_DELETE_PUT_GETDATA: int = 3
 EXAMPLE: int = 4
 
+# LOCAL
 
 DATA = {
     'ROOT_DIR' : 'data/',
     'SUBDIR' : {
         'TEMP' : 'temp/',
-        'PERSISTENT' : 'persistent/'
+        'PERSISTENT' : {
+            'NAME' : 'persistent/',
+            'CRIT_ALT_DATA' : 'base_crit_alt.json',
+            'CRIT_ALT_DATA_BU' : 'base_crit_alt_backup.json'
+        }
     }
 }

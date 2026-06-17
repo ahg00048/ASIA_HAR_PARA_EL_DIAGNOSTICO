@@ -1,37 +1,43 @@
 import sys
+from .config import *;
 from PyQt6 import uic
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QStackedWidget
 from .widgets import widget_alternativesTable, widget_criteriaTable, widget_login, widget_patientsTable
 
 class Main_window(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('', self)
+        uic.loadUi(RESOURCES_DIR / "mainwindow.ui", self)
         self.setWindowTitle("ASIA HAR DESKTOP")
-        
-        self.login = widget_login.Login()
-        self.patientsList = widget_patientsTable.PatientsTable()
-        self.criteriaTable = widget_criteriaTable.CriteriaTable()
-        self.alternativesTable = widget_alternativesTable.AlternativesTable([])
 
-        self.stackedWidget.addWidget(self.login)
-        self.stackedWidget.addWidget(self.patientsList)
-        self.stackedWidget.addWidget(self.criteriaTable)
-        self.stackedWidget.addWidget(self.alternativesTable)
+        self._login = widget_login.Login()
+        self._patientsList = widget_patientsTable.PatientsTable()
+        self._criteriaTable = widget_criteriaTable.CriteriaTable()
+        self._alternativesTable = widget_alternativesTable.AlternativesTable([])
+        
+        self.stackedWidget.addWidget(self._login)
+        self.stackedWidget.addWidget(self._patientsList)
+        self.stackedWidget.addWidget(self._criteriaTable)
+        self.stackedWidget.addWidget(self._alternativesTable)
+
+        self.stackedWidget.setCurrentIndex(3)
 
 
     def go_to_login(self):
         self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.currentWidget()
 
 
     def go_to_patientsList(self):
         self.stackedWidget.setCurrentIndex(1)
-
+        self.stackedWidget.currentWidget()
 
     def go_to_criteriaTable(self):
         self.stackedWidget.setCurrentIndex(2)
+        self.stackedWidget.currentWidget()
 
 
     def go_to_alternativesTable(self):
         self.stackedWidget.setCurrentIndex(3)        
+        self.stackedWidget.currentWidget()

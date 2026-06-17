@@ -1,5 +1,6 @@
 from .settings import *
 import os
+import shutil
 import zlib
 import zipfile
 import pandas as pd
@@ -10,7 +11,9 @@ TEMP_USED = []
 def removeFiles(filePaths):
     for file in filePaths:
         if os.path.isfile(file):
-            os.remove(filePaths)
+            os.remove(file)
+        else:
+            shutil.rmtree(file)
 
     filePaths.clear()
 
@@ -25,7 +28,7 @@ def compressFiles(filePaths, house_id, dataRootDir, dataSubDirs):
         for file_name in filePaths:
             zf.write(file_name, file_name.split("/")[-1], compress_type=compression)
     except FileNotFoundError:
-        print("Unable to compress file")
+        raise Exception
     finally:
         zf.close()
 
@@ -105,8 +108,8 @@ def makeZipFromDataFrames(data_frames, path, subdir_format, house_id):
 # Public =================================================================0
 
 def retrieveData_Test(house_id: int, time_range_in_seconds):
+    print(TEMP_USED)
     removeFiles(TEMP_USED)
-
     dataRootDir = DATASETS_TEST['DIR']
     dataSubDirs = DATASETS_TEST['SUBDIRS_FORMAT'] 
     dataFilesFormat = DATASETS_TEST['FILES_FORMAT'] # list

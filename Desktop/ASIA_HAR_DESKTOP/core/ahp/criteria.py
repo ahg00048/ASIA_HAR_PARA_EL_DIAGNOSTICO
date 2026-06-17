@@ -82,5 +82,3 @@ def relateCriterias(crit_one: Criteria, crit_two: Criteria, w_two_by_one: float)
 def unrelateCriterias(crit_one: Criteria, crit_two: Criteria):
     crit_one.rmCriteriaRel_Crit(crit_two)
     crit_two.rmCriteriaRel_Crit(crit_one)
-
-

@@ -1,4 +1,4 @@
-from ASIA_HAR_DESKTOP.core.config import * 
+from config import * 
 import os
 import pandas as pd
 import numpy as np
@@ -18,6 +18,12 @@ url_patients_get_post = API_HOST['URLs'][PATIENTS_GET_POST]
 url_patients_del_put_getData = API_HOST['URLs'][PATIENTS_DELETE_PUT_GETDATA]
 url_example = API_HOST['URLs'][EXAMPLE]
 
+
+'''
+===============================================================
+|                         temp data                           |
+===============================================================
+'''
 
 # Obtiene el zip dado una url de la api y su id de hogar, y lo almacena en temp
 def retrieveRemoteData_Zip(url, house_id):
@@ -43,7 +49,6 @@ def retrieveDataFrames_Zip(path):
     data_frames = {text_file.filename : pd.read_csv(zip_f.open(text_file.filename)) 
             for text_file in zip_f.infolist() if text_file.filename.endswith('.csv')}
 
-    print(data_frames)
     return data_frames
 
 
@@ -55,6 +60,12 @@ def removeLocalData(path):
     os.remove(path)
 
 
+'''
+===============================================================
+|                     persistent data                         |
+===============================================================
+'''
+
 def retrieveLocalData(path):
     pass
 
@@ -63,13 +74,114 @@ def saveData(path, data):
     pass
 
 
+'''
+===============================================================
+|               Obtaining values with dfs                     |
+===============================================================
+'''
+
+def dataFrames_min_max(dfs: pd.DataFrame, property: str) -> tuple:
+    min = float('inf')
+    max = float('-inf')
+
+    try:
+        for (idx, row) in dfs.iterrows():
+            value = row.loc[property]
+            if value < min:
+                min = value
+            if value > max:
+                max = value
+    except KeyError:
+        return None
+
+    return (min, max)
+
+
+def dataFrames_max(dfs: pd.DataFrame, property: str):
+    max = float('-inf')
+
+    try:
+        for (idx, row) in dfs.iterrows():
+            value = row.loc[property]
+            if value > max:
+                max = value
+    except KeyError:
+        return None
+
+    return max
+
+
+def dataFrames_min(dfs: pd.DataFrame, property: str):
+    min = float('-inf')
+
+    try:
+        for (idx, row) in dfs.iterrows():
+            value = row.loc[property]
+            if value < min:
+                min = value
+    except KeyError:
+        return None
+
+    return min
+
+
+def dataFrames_sum(dfs: pd.DataFrame, property: str):
+    sum = 0.0
+
+    try:
+        for (idx, row) in dfs.iterrows():
+            sum += row.loc[property]
+    except KeyError:
+        return None
+
+    return sum
+
+
+def dataFrames_mean(dfs: pd.DataFrame, property: str):
+    sum = 0.0
+    
+    try:
+        for (idx, row) in dfs.iterrows():
+            sum += row.loc[property]
+    except KeyError:
+        return None
+
+    return sum / len(dfs.index)
+
+
+def dataFrames_list(dfs: pd.DataFrame, property: str):
+    values = []
+    
+    try:
+        for (idx, row) in dfs.iterrows():
+            values.append(row.loc[property])
+    except KeyError:
+        return None
+
+    return values
+
+'''
+========================================================================================
+'''
+
+
 # Obtiene los datos de ejemplo
 def retrieveDataExample():
     house_id = 2
     url = url_api_root + url_example + '?house_id={0}&time_range_in_seconds={1}'
     url = url.format(house_id, 86400)
+    print(url)
 
     zip_filename = retrieveRemoteData_Zip(url, house_id)
-    print(zip_filename)
+
     dfs = retrieveDataFrames_Zip(zip_filename)
+    for dfk in dfs.keys():
+        print(dataFrames_min_max(dfs[dfk], 'humidity'))
+        print(dataFrames_mean(dfs[dfk], 'pressure'))
+        print(dataFrames_sum(dfs[dfk], 'temperature'))
+        print()
+
     removeLocalData(zip_filename)   
+
+if __name__ == '__main__':
+    retrieveDataExample()

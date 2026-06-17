@@ -1,11 +1,26 @@
 import simpful as sf
 
+Fuzzy_System = sf.FuzzySystem()
 
 '''
 +===========================================================+
 | PRESET DE VARIABLES LINGUISTICAS (TEMP, HUMEDAD, PRESION) |
 +===========================================================+
 '''
+
+def create_linguisticVariable(terms: list[tuple[str, list[int]]], var_concept: str) -> tuple[sf.LinguisticVariable, list[str]]:
+    S = []
+    T = []
+
+    for t in terms:
+        S.append(sf.FuzzySet( function=sf.Trapezoidal_MF(t[1][0], t[1][1], t[1][2], t[1][3]), term=t[0]))
+        T.append(t[0])
+
+    low_bound = terms[0][1][0]
+    upp_bound = terms[-1][1][-1]
+
+    return (sf.LinguisticVariable( S, concept=var_concept, universe_of_discourse=[low_bound, upp_bound]), T)
+
 
 # Obtener variable linguistica de temperatura dando sus limites superior, inferior y mediano (calor, frio, templado).
 def create_linguisticVariable_Temperature(temp_lowerBound: float = 5.0, temp_interBound: float = 20.0, temp_upperBound: float = 30.0, gauss_func_sigma: float = 8) -> tuple[sf.LinguisticVariable, list[str]]:
@@ -38,28 +53,6 @@ def create_linguisticVariable_Proximity(press_lowerBound: float = -50.0, press_u
     S_2 = sf.FuzzySet( function=sf.Gaussian_MF(mu=press_upperBound, sigma=gauss_func_sigma), term=terms[1] )
 
     return ( sf.LinguisticVariable( [S_1, S_2], concept="Proximity", universe_of_discourse=[0.0, -200.0]), terms )
-
-
-# faltan
-
-# Obtener variable linguistica de presion (mmHg) dando sus limites ...
-def create_linguisticVariable_Pressure() -> sf.LinguisticVariable:
-    return None
-    S_1 = sf.FuzzySet( function=sf.Gaussian_MF(mu=temp_lowerBound, sigma=gauss_func_sigma), term="cold" )
-    S_2 = sf.FuzzySet( function=sf.Gaussian_MF(mu=temp_interBound, sigma=gauss_func_sigma), term="warm" )
-    S_3 = sf.FuzzySet( function=sf.Gaussian_MF(mu=temp_upperBound, sigma=gauss_func_sigma), term="hot" )
-
-    return sf.LinguisticVariable( [S_1, S_2, S_3], concept="Pressure", universe_of_discourse=[temp_lowerBound, temp_upperBound])
-
-
-# Obtener variable linguistica de pasos (fitness?) dando sus limites ...
-def create_linguisticVariable_Steps() -> sf.LinguisticVariable:
-    return None
-    S_1 = sf.FuzzySet( function=sf.Gaussian_MF(mu=temp_lowerBound, sigma=gauss_func_sigma), term="cold" )
-    S_2 = sf.FuzzySet( function=sf.Gaussian_MF(mu=temp_interBound, sigma=gauss_func_sigma), term="warm" )
-    S_3 = sf.FuzzySet( function=sf.Gaussian_MF(mu=temp_upperBound, sigma=gauss_func_sigma), term="hot" )
-
-    return sf.LinguisticVariable( [S_1, S_2, S_3], concept="Fitness", universe_of_discourse=[temp_lowerBound, temp_upperBound])
 
 
 '''
