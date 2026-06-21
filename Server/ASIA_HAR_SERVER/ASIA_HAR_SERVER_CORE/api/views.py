@@ -197,13 +197,14 @@ def getPatientData(request, userId, patientId):
 
 def getExamplePatientData(request):
     house_id = int(request.query_params.get('house_id'))
-    time_range_in_seconds = int(request.query_params.get('time_range_in_seconds'))
+    time_start_in_seconds = float(request.query_params.get('time_start_in_seconds'))
+    time_range_in_seconds = float(request.query_params.get('time_range_in_seconds'))
     
-    if house_id is None or time_range_in_seconds is None:
+    if house_id is None or time_range_in_seconds is None or time_start_in_seconds is None:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        dataPath = retrieveData_Test(house_id, time_range_in_seconds)
+        dataPath = retrieveData_Test(house_id, time_start_in_seconds, time_range_in_seconds)
         file = open(dataPath, 'rb')
     except BaseException:
         return Response(status=status.HTTP_204_NO_CONTENT)

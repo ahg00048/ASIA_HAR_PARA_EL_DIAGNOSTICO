@@ -32,8 +32,18 @@ DATA = {
         'TEMP' : 'temp/',
         'PERSISTENT' : {
             'NAME' : 'persistent/',
-            'CRIT_ALT_DATA' : 'base_crit_alt.json',
-            'CRIT_ALT_DATA_BU' : 'base_crit_alt_backup.json'
+            'CRIT_DATA' : 'save_crit.json',
+            'CRIT_DATA_BU' : 'save_crit_backup.json',
+            'ALT_DATA' : 'save_alt.json',
+            'ALT_DATA_BU' : 'save_alt_backup.json',
+
+            'CRIT_ALT_DATA_NAME' : 'name',
+            'CRIT_ALT_DATA_REL_WEIGHT' : 'weight',
+            'CRIT_ALT_DATA_REL_CRIT' : 'crit',
+            'CRIT_DATA_REL' : 'criteria_relations',
+
+            'ALT_DATA_REL_ALT' : 'alt',
+            'ALT_DATA_REL' : 'alternatives_relations'
         }
     }
 }

@@ -2,12 +2,8 @@ class Criteria_rel:
     weight = 1
     crit = None
 
-    def __init__(self, crit, weight):
+    def __init__(self, crit, weight = 1):
         self.weight = weight
-        self.crit = crit
-
-    def __init__(self, crit):
-        self.weight = 1
         self.crit = crit
 
     def __str__(self):
@@ -17,58 +13,67 @@ class Criteria_rel:
 
 class Criteria:
     name = ""
-    __criteria_relations = []
 
     def __init__(self, name):
         self.name = name
-        self.__criteria_relations.append(Criteria_rel(self))
+        self._criteria_relations = list()
 
 # añadir relaciones entre criterios
 
+    def addCriteriaRel_Self(self):
+        if not any(rel.crit == self for rel in self._criteria_relations):
+            self._criteria_relations.append(Criteria_rel(self))
+
     def addCriteriaRel_CritRel(self, crit_rel):
-        if self.__criteria_relations.count(crit_rel) == 0:
-            self.__criteria_relations.append(crit_rel)
+        if self._criteria_relations.count(crit_rel) == 0:
+            self._criteria_relations.append(crit_rel)
 
     def addCriteriaRel_Crit(self, crit, weight):
-        if not any(rel.crit == crit for rel in self.__criteria_relations):
-            self.__criteria_relations.append(Criteria_rel(crit, weight))
+        if not any(rel.crit == crit for rel in self._criteria_relations):
+            self._criteria_relations.append(Criteria_rel(crit, weight))
 
 # Eliminar relaciones entre criterios
 
     def rmCriteriaRel_CritRel(self, crit_rel):
-        if self.__criteria_relations.count(crit_rel) != 0:
-            self.__criteria_relations.remove(crit_rel)
+        if self._criteria_relations.count(crit_rel) != 0:
+            self._criteria_relations.remove(crit_rel)
         
     def rmCriteriaRel_Crit(self, crit):
-        for rel in self.__criteria_relations:
+        for rel in self._criteria_relations:
             if rel.crit == crit:
-                self.__criteria_relations.remove(rel)
+                self._criteria_relations.remove(rel)
 
 # Obtener relaciones entre criterios
 
     def getCriteriaRels(self):
-        return self.__criteria_relations.copy()
+        return self._criteria_relations.copy()
+
+    def hasCriteriaInRels(self, crit):
+        for rel in self._criteria_relations:
+            if rel.crit == crit:
+                return True
+        return False
 
 # Obtener pesos
 
     def getTotalWeight(self):
         weight = 0.0
-        for rel in self.__criteria_relations:
+        for rel in self._criteria_relations:
             weight += rel.weight
         return weight
 
     def getCritWeight_Crit(self, crit):
-        for rel in self.__criteria_relations:
+        for rel in self._criteria_relations:
             if rel.crit == crit:
                 return rel.weight
             
     def getCritWeight_Name(self, critName):
-        for rel in self.__criteria_relations:
+        for rel in self._criteria_relations:
             if rel.crit.name == critName:
                 return rel.weight
 
     def __str__(self):
-        return "Criteria {0} -> Weights: {1}".format(self.name, self.__criteria_relations)
+        return "Criteria {0} -> Weights: {1}".format(self.name, self._criteria_relations)
 
     def __eq__(self, value):
         return self.name == value.name

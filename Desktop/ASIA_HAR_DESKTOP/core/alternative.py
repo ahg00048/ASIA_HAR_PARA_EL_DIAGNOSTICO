@@ -1,17 +1,12 @@
-from ASIA_HAR_DESKTOP.core.ahp.criteria import *
+from criteria import *
 
 class Alternative_rel:
     weight = 1
     crit = None
     alt = None
 
-    def __init__(self, crit, alt, weight):
+    def __init__(self, crit, alt, weight = 1):
         self.weight = weight
-        self.crit = crit
-        self.alt = alt
-
-    def __init__(self, crit, alt):
-        self.weight = 1
         self.crit = crit
         self.alt = alt
 
@@ -22,62 +17,67 @@ class Alternative_rel:
 
 class Alternative:
     name = ""
-    __alternative_relations = []
 
     def __init__(self, name):
+        self._alternative_relations = list() 
         self.name = name
 
 # añadir relaciones entre criterios
 
     def addAlternativeRel_Self(self, crit):
-        if not any((rel.alt == self and rel.crit == crit) for rel in self.__alternative_relations):
-            self.__alternative_relations.append(Alternative_rel(crit, self))
+        if not any((rel.alt == self and rel.crit == crit) for rel in self._alternative_relations):
+            self._alternative_relations.append(Alternative_rel(crit, self))
 
     def addAlternativeRel_AltRel(self, alt_rel):
-        if self.__alternative_relations.count(alt_rel) == 0:
-            self.__alternative_relations.append(alt_rel)
+        if self._alternative_relations.count(alt_rel) == 0:
+            self._alternative_relations.append(alt_rel)
 
     def addAlternativeRel_alt(self, crit, alt, weight):
-        if not any((rel.alt == alt and rel.crit == crit) for rel in self.__alternative_relations):
-            self.__alternative_relations.append(Alternative_rel(crit, alt, weight))
+        if not any((rel.alt == alt and rel.crit == crit) for rel in self._alternative_relations):
+            self._alternative_relations.append(Alternative_rel(crit, alt, weight))
 
 # Eliminar relaciones entre criterios
 
     def rmAlternativeRel_AltRel(self, alt_rel):
-        if self.__alternative_relations.count(alt_rel) != 0:
-            self.__alternative_relations.remove(alt_rel)
+        if self._alternative_relations.count(alt_rel) != 0:
+            self._alternative_relations.remove(alt_rel)
         
     def rmAlternativeRel_alt(self, alt):
-        for rel in self.__alternative_relations:
+        for rel in self._alternative_relations:
             if rel.alt == alt:
-                self.__alternative_relations.remove(rel)
+                self._alternative_relations.remove(rel)
 
 # Obtener relaciones entre criterios
 
     def getAlternativeRels(self):
-        return self.__alternative_relations.copy()
+        return self._alternative_relations.copy()
 
+    def hasAlternativeInRels(self, crit, alt):
+        for rel in self._alternative_relations:
+            if rel.crit == crit and rel.alt == alt:
+                return True
+        return False
 # Obtener pesos
 
     def getTotalWeight_Crit(self, crit):
         weight = 0.0
-        for rel in self.__alternative_relations:
+        for rel in self._alternative_relations:
             if rel.crit == crit:
                 weight += rel.weight
         return weight
 
     def getAltWeight_Crit_Alt(self, crit, alt):
-        for rel in self.__alternative_relations:
+        for rel in self._alternative_relations:
             if rel.crit == crit and rel.alt == alt:
                 return rel.weight
             
     def getAltWeight_Name(self, critName, altName):
-        for rel in self.__alternative_relations:
+        for rel in self._alternative_relations:
             if rel.crit.name == critName and rel.alt.name == altName:
                 return rel.weight
 
     def __str__(self):
-        return "Alternative {0} -> Weights: {1}".format(self.name, self.__alternative_relations)
+        return "Alternative {0} -> Weights: {1}".format(self.name, self._alternative_relations)
 
     def __eq__(self, value):
         return self.name == value.name

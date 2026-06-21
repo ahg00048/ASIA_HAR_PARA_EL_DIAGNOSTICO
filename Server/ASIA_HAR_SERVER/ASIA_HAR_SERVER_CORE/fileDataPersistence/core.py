@@ -4,7 +4,7 @@ import shutil
 import zlib
 import zipfile
 import pandas as pd
-
+import numpy as np
 
 TEMP_USED = []
 
@@ -56,32 +56,53 @@ def retrieveDataFrames(path):
 
 
 # Recorta los archovos de los sensores para que se encuentren en el margen mas reciente de tiempo dado
-def cullDataFromRecentTimeRange(data_frames, time_range_in_seconds):
+def cullDataFromTimeRange(data_frames, time_start_in_seconds, time_range_in_seconds):
     col_label = 'timestamp'
     new_data_frames = {}
     
     for key in data_frames.keys():
         df = data_frames[key]
 
-        begin_index = 1
+        # Search begin
+        begin_index = 0
         end_index = len(df.index)
-        last_timestamp = int(df.at[len(df.index) - 1, col_label])
-
-        desired_timestamp = (last_timestamp - time_range_in_seconds)
-
-        while begin_index <= end_index:
-            mid_index = int((end_index + begin_index) / 2)
+        while begin_index < end_index:
+            mid_index = (end_index + begin_index) // 2
             
             if mid_index == end_index or mid_index == begin_index:
                 break
 
-            if int(df.at[mid_index, col_label]) <= desired_timestamp:
+            if float(df.at[mid_index, col_label]) <= time_start_in_seconds:
                 begin_index = mid_index
             else:
                 end_index = mid_index
-        new_df = df.drop(index=df.index[:mid_index], inplace=False)
+                
+        init_index = mid_index;
+
+        time_end_in_seconds = time_start_in_seconds + time_range_in_seconds
+
+        # Search end
+        begin_index = 0
+        end_index = len(df.index)
+        while begin_index < end_index:
+            mid_index = (end_index + begin_index) // 2
+            
+            if mid_index == end_index or mid_index == begin_index:
+                break
+
+            if int(df.at[mid_index, col_label]) <= time_end_in_seconds:
+                begin_index = mid_index
+            else:
+                end_index = mid_index
         
+        final_index = mid_index
+
+        new_df = df.drop(index=df.index[:init_index], inplace=False)
+        new_df.drop(index=df.index[final_index:], inplace=True)
+
         new_data_frames[key] = new_df
+        print(init_index, final_index)
+        print(time_start_in_seconds, time_end_in_seconds, time_range_in_seconds)
 
     return new_data_frames
 
@@ -107,8 +128,7 @@ def makeZipFromDataFrames(data_frames, path, subdir_format, house_id):
 
 # Public =================================================================0
 
-def retrieveData_Test(house_id: int, time_range_in_seconds):
-    print(TEMP_USED)
+def retrieveData_Test(house_id: int, time_start_in_seconds, time_range_in_seconds):
     removeFiles(TEMP_USED)
     dataRootDir = DATASETS_TEST['DIR']
     dataSubDirs = DATASETS_TEST['SUBDIRS_FORMAT'] 
@@ -130,7 +150,7 @@ def retrieveData_Test(house_id: int, time_range_in_seconds):
 
     dataPath = getCompressedDataPath(house_id, dataRootDir, dataSubDirs)
     dfs = retrieveDataFrames(dataPath)
-    dfs = cullDataFromRecentTimeRange(dfs, time_range_in_seconds)
+    dfs = cullDataFromTimeRange(dfs, time_start_in_seconds, time_range_in_seconds)
 
     path_format = "%s/%s{0}/%s/" % (dataRootDir, dataSubDirs, TEMP_DIR)
     resultPath = makeZipFromDataFrames(dfs, path_format.format(house_id), dataSubDirs, house_id)

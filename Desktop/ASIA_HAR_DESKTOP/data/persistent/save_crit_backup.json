@@ -1,0 +1,39 @@
+{
+    "criteria": 
+    [
+        {
+            "name": "Cantidad de pasos",
+            "criteria_relations": 
+            [
+                {
+                    "crit":"Actividad nocturna",
+                    "weight":2.0
+                },
+                {
+                    "crit":"Nº de aperturas de puertas",
+                    "weight":4.0
+                }
+            ]
+        },
+        {
+            "name": "Actividad nocturna",
+            "criteria_relations": 
+            [
+                {
+                    "crit":"Cantidad de pasos",
+                    "weight":2.0
+                },
+                {
+                    "crit":"Nº de aperturas de puertas",
+                    "weight":4.0
+                }
+            ]
+        },
+        {
+            "name": "Nº de aperturas de puertas",
+            "criteria_relations": 
+            [
+            ]
+        }
+    ]
+}

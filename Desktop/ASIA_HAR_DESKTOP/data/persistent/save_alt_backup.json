@@ -1,31 +1,15 @@
 {
-    "criteria": 
-    [
-        {
-            "name": "Cantidad de pasos",
-            "criteria_relations": 
-            [
-            ]
-        },
-        {
-            "name": "Actividad nocturna",
-            "criteria_relations": 
-            [
-            ]
-        },
-        {
-            "name": "Nº de aperturas de puertas",
-            "criteria_relations": 
-            [
-            ]
-        }
-    ],
     "alternatives":
     [
         {
             "name": "Estado normal",
             "alternatives_relations": 
             [
+                {
+                    "crit" : "Actividad nocturna",
+                    "alt" : "Estado desorientado",
+                    "weight" : 3.0
+                }
             ]
         },
         {
@@ -38,6 +22,11 @@
             "name": "Estado de agitación",
             "alternatives_relations": 
             [
+                {
+                    "crit" : "Actividad nocturna",
+                    "alt" : "Estado desorientado",
+                    "weight" : 3.0
+                }
             ]
         },
         {

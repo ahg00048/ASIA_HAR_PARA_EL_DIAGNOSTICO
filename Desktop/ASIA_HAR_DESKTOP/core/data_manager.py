@@ -1,14 +1,13 @@
 from config import * 
+from serializer_utils import *
 import os
 import pandas as pd
-import numpy as np
 import requests
-import math
 from zipfile import ZipFile
 
 
 path_data_temp = BASE_DIR / DATA['ROOT_DIR'] / DATA['SUBDIR']['TEMP']
-path_data_persist = BASE_DIR / DATA['ROOT_DIR'] / DATA['SUBDIR']['PERSISTENT']
+path_data_persist = BASE_DIR / DATA['ROOT_DIR'] / DATA['SUBDIR']['PERSISTENT']['NAME']
 
 url_api_root = 'http://' + API_HOST['IP_ADDRESS'] + ':' + API_HOST['PORT']  + '/' + API_HOST['ROOT_URL']
 
@@ -66,99 +65,97 @@ def removeLocalData(path):
 ===============================================================
 '''
 
-def retrieveLocalData(path):
-    pass
+data_persistence = DATA['SUBDIR']['PERSISTENT']
+
+crit_data = data_persistence['CRIT_DATA']
+crit_data_bu = data_persistence['CRIT_DATA_BU']
+alt_data = data_persistence['ALT_DATA']
+alt_data_bu = data_persistence['ALT_DATA_BU']
+
+_all_name = data_persistence['CRIT_ALT_DATA_NAME']
+_all_weight = data_persistence['CRIT_ALT_DATA_REL_WEIGHT']
+_all_rel_crit = data_persistence['CRIT_ALT_DATA_REL_CRIT']
+
+_crit_rel = data_persistence['CRIT_DATA_REL']
+
+_alt_rel_alt = data_persistence['ALT_DATA_REL_ALT']
+_alt_rel = data_persistence['ALT_DATA_REL']
 
 
-def saveData(path, data):
-    pass
+#=================================================================
 
+def get_all_crit(backup = False):
+    criteria_aux = []
 
-'''
-===============================================================
-|               Obtaining values with dfs                     |
-===============================================================
-'''
+    data_path = (crit_data if not backup else crit_data_bu)
+    with open(path_data_persist / data_path) as f:
+        f_content = f.read()
+        criteria_aux = crit_list_from_json(f_content)
 
-def dataFrames_min_max(dfs: pd.DataFrame, property: str) -> tuple:
-    min = float('inf')
-    max = float('-inf')
-
-    try:
-        for (idx, row) in dfs.iterrows():
-            value = row.loc[property]
-            if value < min:
-                min = value
-            if value > max:
-                max = value
-    except KeyError:
-        return None
-
-    return (min, max)
-
-
-def dataFrames_max(dfs: pd.DataFrame, property: str):
-    max = float('-inf')
-
-    try:
-        for (idx, row) in dfs.iterrows():
-            value = row.loc[property]
-            if value > max:
-                max = value
-    except KeyError:
-        return None
-
-    return max
-
-
-def dataFrames_min(dfs: pd.DataFrame, property: str):
-    min = float('-inf')
-
-    try:
-        for (idx, row) in dfs.iterrows():
-            value = row.loc[property]
-            if value < min:
-                min = value
-    except KeyError:
-        return None
-
-    return min
-
-
-def dataFrames_sum(dfs: pd.DataFrame, property: str):
-    sum = 0.0
-
-    try:
-        for (idx, row) in dfs.iterrows():
-            sum += row.loc[property]
-    except KeyError:
-        return None
-
-    return sum
-
-
-def dataFrames_mean(dfs: pd.DataFrame, property: str):
-    sum = 0.0
+    criteria = [ t[0] for t in criteria_aux ]
     
-    try:
-        for (idx, row) in dfs.iterrows():
-            sum += row.loc[property]
-    except KeyError:
-        return None
+    for i in range(len(criteria_aux)):
+        curr_crit = criteria[i]
+        curr_crit.addCriteriaRel_Self()
+        curr_crit_rel = criteria_aux[i][1]
 
-    return sum / len(dfs.index)
+        for rel in curr_crit_rel:
+            for j in range(len(criteria)):
+                if rel[_all_rel_crit] == criteria[j].name and not curr_crit.hasCriteriaInRels(criteria[j]):
+                    relateCriterias(curr_crit, criteria[j], rel[_all_weight])
+                    break
+
+    return criteria
 
 
-def dataFrames_list(dfs: pd.DataFrame, property: str):
-    values = []
+def save_all_crit(criteria: list[Criteria], backup = False):
+    file_content = crit_list_to_json(criteria)
+
+    data_path = (crit_data if not backup else crit_data_bu)
+    with open(path_data_persist / data_path, "w") as f:
+        f.write(file_content)
+
+
+#=================================================================
+
+def get_all_alt(criteria: list[Criteria], backup = False):
+    alternatives_aux = []
+
+    data_path = (alt_data if not backup else alt_data_bu)
+    with open(path_data_persist / data_path) as f:
+        f_content = f.read()
+        alternatives_aux = alt_list_from_json(f_content)
+
+    alternatives = [ t[0] for t in alternatives_aux ]
     
-    try:
-        for (idx, row) in dfs.iterrows():
-            values.append(row.loc[property])
-    except KeyError:
-        return None
+    for i in range(len(alternatives_aux)):
+        curr_alt = alternatives[i]
+        curr_alt_rel = alternatives_aux[i][1]
 
-    return values
+        for crit in criteria:
+            curr_alt.addAlternativeRel_Self(crit)
+
+        curr_crit = None
+        for rel in curr_alt_rel:
+            for crit in criteria:
+                if crit.name == rel[_all_rel_crit]:
+                    curr_crit = crit
+
+            for j in range(len(alternatives)):
+                if rel[_alt_rel_alt] == alternatives[j].name and not curr_alt.hasAlternativeInRels(curr_crit, alternatives[j]):
+                    relateAlternatives(curr_crit, curr_alt, alternatives[j], rel[_all_weight])
+                    break
+
+    return alternatives
+
+
+def save_all_alt(alternatives: list[Alternative], backup = False):
+    file_content = alt_list_to_json(alternatives)
+
+    data_path = (alt_data if not backup else alt_data_bu)
+    with open(path_data_persist / data_path, "w") as f:
+        f.write(file_content)
+
 
 '''
 ========================================================================================
@@ -175,13 +172,5 @@ def retrieveDataExample():
     zip_filename = retrieveRemoteData_Zip(url, house_id)
 
     dfs = retrieveDataFrames_Zip(zip_filename)
-    for dfk in dfs.keys():
-        print(dataFrames_min_max(dfs[dfk], 'humidity'))
-        print(dataFrames_mean(dfs[dfk], 'pressure'))
-        print(dataFrames_sum(dfs[dfk], 'temperature'))
-        print()
 
     removeLocalData(zip_filename)   
-
-if __name__ == '__main__':
-    retrieveDataExample()
