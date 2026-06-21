@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Widget_TimeRangeWidget</class>
+ <widget class="QWidget" name="Widget_TimeRangeWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>480</width>
+    <height>280</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Intervalo de monitorización</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QWidget {
+        background-color: #F5FCFC;
+        font-family: "Segoe UI", "Roboto", sans-serif;
+        font-size: 14px;
+        color: #2C3E50;
+    }
+    QLabel#titleLabel {
+        font-size: 18px;
+        font-weight: bold;
+        color: #1C7C7C;
+        padding: 8px;
+    }
+    QLabel#startLabel, QLabel#endLabel {
+        font-size: 14px;
+        font-weight: bold;
+        color: #00695C;
+        margin-top: 8px;
+    }
+    QDateTimeEdit {
+        background-color: #FFFFFF;
+        border: 1px solid #B2DFDB;
+        border-radius: 4px;
+        padding: 6px;
+        color: #2C3E50;
+    }
+    QDateTimeEdit:focus {
+        border: 1px solid #26A69A;
+    }
+    QPushButton {
+        background-color: #26A69A;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-weight: bold;
+    }
+    QPushButton:hover {
+        background-color: #00897B;
+    }
+    QPushButton:pressed {
+        background-color: #00796B;
+    }
+    QPushButton#backButton {
+        background-color: #80CBC4;
+    }
+    QPushButton#backButton:hover {
+        background-color: #4DB6AC;
+    }
+    QPushButton#nextButton {
+        background-color: #009688;
+    }
+    QPushButton#nextButton:hover {
+        background-color: #00796B;
+    }
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>16</number>
+   </property>
+   <property name="leftMargin">
+    <number>30</number>
+   </property>
+   <property name="topMargin">
+    <number>24</number>
+   </property>
+   <property name="rightMargin">
+    <number>30</number>
+   </property>
+   <property name="bottomMargin">
+    <number>24</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="titleLabel">
+     <property name="text">
+      <string>Seleccione el intervalo de monitorización</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="dateTimeLayout">
+     <property name="spacing">
+      <number>8</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="startLabel">
+       <property name="text">
+        <string>Fecha y hora de inicio:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDateTimeEdit" name="startDateTime">
+       <property name="displayFormat">
+        <string>dd/MM/yyyy HH:mm</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+       <property name="dateTime">
+        <datetime>
+         <year>2026</year>
+         <month>06</month>
+         <day>21</day>
+         <hour>12</hour>
+         <minute>00</minute>
+        </datetime>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="endLabel">
+       <property name="text">
+        <string>Fecha y hora de fin:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDateTimeEdit" name="endDateTime">
+       <property name="displayFormat">
+        <string>dd/MM/yyyy HH:mm</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+       <property name="dateTime">
+        <datetime>
+         <year>2026</year>
+         <month>06</month>
+         <day>21</day>
+         <hour>13</hour>
+         <minute>00</minute>
+        </datetime>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="errorLabel">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="styleSheet">
+        <string>color: red; font-size: 12px;</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="navigationLayout">
+     <property name="spacing">
+      <number>12</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="backButton">
+       <property name="text">
+        <string>← Volver</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="nextButton">
+       <property name="text">
+        <string>Siguiente →</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
