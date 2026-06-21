@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>560</width>
-    <height>500</height>
+    <height>540</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -75,6 +75,24 @@
         background-color: #00897B;
     }
     QPushButton:pressed {
+        background-color: #00796B;
+    }
+    QPushButton#backButton {
+        background-color: #80CBC4;
+    }
+    QPushButton#backButton:hover {
+        background-color: #4DB6AC;
+    }
+    QPushButton#saveButton {
+        background-color: #26A69A;
+    }
+    QPushButton#saveButton:hover {
+        background-color: #00897B;
+    }
+    QPushButton#nextButton {
+        background-color: #009688;
+    }
+    QPushButton#nextButton:hover {
         background-color: #00796B;
     }
    </string>
@@ -158,6 +176,43 @@
         </size>
        </property>
       </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="navigationLayout">
+     <property name="spacing">
+      <number>12</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="backButton">
+       <property name="text">
+        <string>← Volver</string>
+       </property>
+       <property name="toolTip">
+        <string>Regresar a la vista de criterios</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveButton">
+       <property name="text">
+        <string>💾 Guardar</string>
+       </property>
+       <property name="toolTip">
+        <string>Guardar el estado actual de las matrices</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="nextButton">
+       <property name="text">
+        <string>Siguiente →</string>
+       </property>
+       <property name="toolTip">
+        <string>Continuar al siguiente paso del proceso</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

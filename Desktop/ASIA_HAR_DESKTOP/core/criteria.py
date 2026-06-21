@@ -84,6 +84,14 @@ def relateCriterias(crit_one: Criteria, crit_two: Criteria, w_two_by_one: float)
     crit_one.addCriteriaRel_Crit(crit_two, w_two_by_one)
     crit_two.addCriteriaRel_Crit(crit_one, 1 / w_two_by_one)
 
+def alterCriteriasWeight(crit_one: Criteria, crit_two: Criteria, w_two_by_one: float):
+    for crit_rel in crit_one._criteria_relations:
+        if crit_rel.crit == crit_two:
+            crit_rel.weight = w_two_by_one
+    for crit_rel in crit_two._criteria_relations:
+        if crit_rel.crit == crit_one:
+            crit_rel.weight = (1 / w_two_by_one)
+
 def unrelateCriterias(crit_one: Criteria, crit_two: Criteria):
     crit_one.rmCriteriaRel_Crit(crit_two)
     crit_two.rmCriteriaRel_Crit(crit_one)

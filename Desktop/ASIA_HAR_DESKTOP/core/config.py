@@ -37,11 +37,13 @@ DATA = {
             'ALT_DATA' : 'save_alt.json',
             'ALT_DATA_BU' : 'save_alt_backup.json',
 
+            'CRIT_SET_NAME' : 'criteria',
             'CRIT_ALT_DATA_NAME' : 'name',
             'CRIT_ALT_DATA_REL_WEIGHT' : 'weight',
             'CRIT_ALT_DATA_REL_CRIT' : 'crit',
             'CRIT_DATA_REL' : 'criteria_relations',
 
+            'ALT_SET_NAME' : 'alternatives',
             'ALT_DATA_REL_ALT' : 'alt',
             'ALT_DATA_REL' : 'alternatives_relations'
         }

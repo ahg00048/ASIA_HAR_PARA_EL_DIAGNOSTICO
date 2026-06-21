@@ -1,21 +1,21 @@
-from config import * 
-from serializer_utils import *
+from core.config import * 
+from core.serializer_utils import *
 import os
 import pandas as pd
 import requests
 from zipfile import ZipFile
 
 
-path_data_temp = BASE_DIR / DATA['ROOT_DIR'] / DATA['SUBDIR']['TEMP']
-path_data_persist = BASE_DIR / DATA['ROOT_DIR'] / DATA['SUBDIR']['PERSISTENT']['NAME']
+_path_data_temp = BASE_DIR / DATA['ROOT_DIR'] / DATA['SUBDIR']['TEMP']
+_path_data_persist = BASE_DIR / DATA['ROOT_DIR'] / DATA['SUBDIR']['PERSISTENT']['NAME']
 
-url_api_root = 'http://' + API_HOST['IP_ADDRESS'] + ':' + API_HOST['PORT']  + '/' + API_HOST['ROOT_URL']
+_url_api_root = 'http://' + API_HOST['IP_ADDRESS'] + ':' + API_HOST['PORT']  + '/' + API_HOST['ROOT_URL']
 
-url_users_get_post = API_HOST['URLs'][USERS_GET_POST]
-url_users_del_put = API_HOST['URLs'][USERS_DELETE_PUT]
-url_patients_get_post = API_HOST['URLs'][PATIENTS_GET_POST]
-url_patients_del_put_getData = API_HOST['URLs'][PATIENTS_DELETE_PUT_GETDATA]
-url_example = API_HOST['URLs'][EXAMPLE]
+_url_users_get_post = API_HOST['URLs'][USERS_GET_POST]
+_url_users_del_put = API_HOST['URLs'][USERS_DELETE_PUT]
+_url_patients_get_post = API_HOST['URLs'][PATIENTS_GET_POST]
+_url_patients_del_put_getData = API_HOST['URLs'][PATIENTS_DELETE_PUT_GETDATA]
+_url_example = API_HOST['URLs'][EXAMPLE]
 
 
 '''
@@ -31,7 +31,7 @@ def retrieveRemoteData_Zip(url, house_id):
     if response.status_code == requests.status_codes._codes[204]:
         return INVALID_PATH
 
-    zip_filename = path_data_temp / 'house_{0}.zip'.format(house_id)
+    zip_filename = _path_data_temp / 'house_{0}.zip'.format(house_id)
 
     with open(zip_filename, 'wb') as zip_file:
         for chunk in response.iter_content(chunk_size=255): 
@@ -65,21 +65,21 @@ def removeLocalData(path):
 ===============================================================
 '''
 
-data_persistence = DATA['SUBDIR']['PERSISTENT']
+_data_persistence = DATA['SUBDIR']['PERSISTENT']
 
-crit_data = data_persistence['CRIT_DATA']
-crit_data_bu = data_persistence['CRIT_DATA_BU']
-alt_data = data_persistence['ALT_DATA']
-alt_data_bu = data_persistence['ALT_DATA_BU']
+_crit_data = _data_persistence['CRIT_DATA']
+_crit_data_bu = _data_persistence['CRIT_DATA_BU']
+_alt_data = _data_persistence['ALT_DATA']
+_alt_data_bu = _data_persistence['ALT_DATA_BU']
 
-_all_name = data_persistence['CRIT_ALT_DATA_NAME']
-_all_weight = data_persistence['CRIT_ALT_DATA_REL_WEIGHT']
-_all_rel_crit = data_persistence['CRIT_ALT_DATA_REL_CRIT']
+_all_name = _data_persistence['CRIT_ALT_DATA_NAME']
+_all_weight = _data_persistence['CRIT_ALT_DATA_REL_WEIGHT']
+_all_rel_crit = _data_persistence['CRIT_ALT_DATA_REL_CRIT']
 
-_crit_rel = data_persistence['CRIT_DATA_REL']
+_crit_rel = _data_persistence['CRIT_DATA_REL']
 
-_alt_rel_alt = data_persistence['ALT_DATA_REL_ALT']
-_alt_rel = data_persistence['ALT_DATA_REL']
+_alt_rel_alt = _data_persistence['ALT_DATA_REL_ALT']
+_alt_rel = _data_persistence['ALT_DATA_REL']
 
 
 #=================================================================
@@ -87,8 +87,8 @@ _alt_rel = data_persistence['ALT_DATA_REL']
 def get_all_crit(backup = False):
     criteria_aux = []
 
-    data_path = (crit_data if not backup else crit_data_bu)
-    with open(path_data_persist / data_path) as f:
+    data_path = (_crit_data if not backup else _crit_data_bu)
+    with open(_path_data_persist / data_path) as f:
         f_content = f.read()
         criteria_aux = crit_list_from_json(f_content)
 
@@ -111,8 +111,8 @@ def get_all_crit(backup = False):
 def save_all_crit(criteria: list[Criteria], backup = False):
     file_content = crit_list_to_json(criteria)
 
-    data_path = (crit_data if not backup else crit_data_bu)
-    with open(path_data_persist / data_path, "w") as f:
+    data_path = (_crit_data if not backup else _crit_data_bu)
+    with open(_path_data_persist / data_path, "w") as f:
         f.write(file_content)
 
 
@@ -121,8 +121,8 @@ def save_all_crit(criteria: list[Criteria], backup = False):
 def get_all_alt(criteria: list[Criteria], backup = False):
     alternatives_aux = []
 
-    data_path = (alt_data if not backup else alt_data_bu)
-    with open(path_data_persist / data_path) as f:
+    data_path = (_alt_data if not backup else _alt_data_bu)
+    with open(_path_data_persist / data_path) as f:
         f_content = f.read()
         alternatives_aux = alt_list_from_json(f_content)
 
@@ -152,8 +152,8 @@ def get_all_alt(criteria: list[Criteria], backup = False):
 def save_all_alt(alternatives: list[Alternative], backup = False):
     file_content = alt_list_to_json(alternatives)
 
-    data_path = (alt_data if not backup else alt_data_bu)
-    with open(path_data_persist / data_path, "w") as f:
+    data_path = (_alt_data if not backup else _alt_data_bu)
+    with open(_path_data_persist / data_path, "w") as f:
         f.write(file_content)
 
 
@@ -161,11 +161,10 @@ def save_all_alt(alternatives: list[Alternative], backup = False):
 ========================================================================================
 '''
 
-
 # Obtiene los datos de ejemplo
 def retrieveDataExample():
     house_id = 2
-    url = url_api_root + url_example + '?house_id={0}&time_range_in_seconds={1}'
+    url = _url_api_root + _url_example + '?house_id={0}&time_range_in_seconds={1}'
     url = url.format(house_id, 86400)
     print(url)
 

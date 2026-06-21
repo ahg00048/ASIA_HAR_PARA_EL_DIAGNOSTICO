@@ -1,5 +1,6 @@
 import sys
 from .config import *;
+from model.crit_alt import Crit_Alt
 from PyQt6 import uic
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QStackedWidget
@@ -11,17 +12,20 @@ class Main_window(QMainWindow):
         uic.loadUi(RESOURCES_DIR / "mainwindow.ui", self)
         self.setWindowTitle("ASIA HAR DESKTOP")
 
+        self._model = Crit_Alt()
         self._login = widget_login.Login()
         self._patientsList = widget_patientsTable.PatientsTable()
-        self._criteriaTable = widget_criteriaTable.CriteriaTable()
-        self._alternativesTable = widget_alternativesTable.AlternativesTable([])
+        self._criteriaTable = widget_criteriaTable.CriteriaTable(self.go_to_login, self.go_to_alternativesTable, self._model)
+        self._alternativesTable = widget_alternativesTable.AlternativesTable(self.go_to_criteriaTable, self.go_to_alternativesTable, self._model)
         
         self.stackedWidget.addWidget(self._login)
         self.stackedWidget.addWidget(self._patientsList)
         self.stackedWidget.addWidget(self._criteriaTable)
         self.stackedWidget.addWidget(self._alternativesTable)
 
-        self.stackedWidget.setCurrentIndex(3)
+        # Vista inicial
+        self.go_to_criteriaTable()
+
 
 
     def go_to_login(self):

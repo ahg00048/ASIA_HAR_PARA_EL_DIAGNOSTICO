@@ -1,18 +1,20 @@
-from alternative import *
-from criteria import *
-from config import DATA
+from core.alternative import *
+from core.criteria import *
+from core.config import DATA
 import json
 
-data_persistence = DATA['SUBDIR']['PERSISTENT']
+_data_persistence = DATA['SUBDIR']['PERSISTENT']
 
-_all_name = data_persistence['CRIT_ALT_DATA_NAME']
-_all_weight = data_persistence['CRIT_ALT_DATA_REL_WEIGHT']
-_all_rel_crit = data_persistence['CRIT_ALT_DATA_REL_CRIT']
+_all_name = _data_persistence['CRIT_ALT_DATA_NAME']
+_all_weight = _data_persistence['CRIT_ALT_DATA_REL_WEIGHT']
+_all_rel_crit = _data_persistence['CRIT_ALT_DATA_REL_CRIT']
 
-_crit_rel = data_persistence['CRIT_DATA_REL']
+_crit_set_name = _data_persistence['CRIT_SET_NAME']
+_crit_rel = _data_persistence['CRIT_DATA_REL']
 
-_alt_rel_alt = data_persistence['ALT_DATA_REL_ALT']
-_alt_rel = data_persistence['ALT_DATA_REL']
+_alt_set_name = _data_persistence['ALT_SET_NAME']
+_alt_rel_alt = _data_persistence['ALT_DATA_REL_ALT']
+_alt_rel = _data_persistence['ALT_DATA_REL']
 
 
 '''
@@ -53,7 +55,7 @@ def alt_list_to_json(alts: list[Alternative]):
     alt_list = []
     
     for alt in alts:
-        alt_rel = alt.getAlternativeRels()
+        alt_rels = alt.getAlternativeRels()
 
         dict = {
             _all_name : alt.name,
@@ -61,11 +63,11 @@ def alt_list_to_json(alts: list[Alternative]):
             ] 
         }
 
-        for rel in alt_rel:
+        for rel in alt_rels:
             if rel.alt == alt:
                 continue
 
-            dict[alt_rel].append({
+            dict[_alt_rel].append({
                 _all_rel_crit : rel.crit.name,
                 _alt_rel_alt : rel.alt.name,
                 _all_weight : rel.weight
@@ -73,7 +75,7 @@ def alt_list_to_json(alts: list[Alternative]):
 
         alt_list.append(dict.copy())
 
-    return json.dumps({"alternatives" : alt_list})
+    return json.dumps({_alt_set_name : alt_list})
 
 
 '''
@@ -95,10 +97,10 @@ def alt_list_from_json(alt_json) -> list[tuple[Alternative, list[dict]]]:
     alt_list = []
     
     alt_list_aux = json.loads(alt_json)
-    if 'alternatives' not in alt_list_aux:
+    if _alt_set_name not in alt_list_aux:
         return []
     
-    for alt_aux in alt_list_aux['alternatives']:
+    for alt_aux in alt_list_aux[_alt_set_name]:
         alt_list.append((Alternative(alt_aux[_all_name]), alt_aux[_alt_rel]))
     
     return alt_list
@@ -154,7 +156,7 @@ def crit_list_to_json(crits: list[Criteria]):
 
         crit_list.append(dict.copy())
 
-    return json.dumps({"criteria" : crit_list})
+    return json.dumps({_crit_set_name : crit_list})
 
 
 '''
@@ -176,10 +178,10 @@ def crit_list_from_json(alt_json) -> list[tuple[Criteria, list[dict]]]:
     crit_list = []
     
     crit_list_aux = json.loads(alt_json)
-    if 'criteria' not in crit_list_aux:
+    if _crit_set_name not in crit_list_aux:
         return []
 
-    for crit_aux in crit_list_aux['criteria']:
+    for crit_aux in crit_list_aux[_crit_set_name]:
         crit_list.append((Criteria(crit_aux[_all_name]), crit_aux[_crit_rel]))
     
     return crit_list

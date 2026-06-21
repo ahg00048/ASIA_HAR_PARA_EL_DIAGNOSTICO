@@ -1,4 +1,4 @@
-from criteria import *
+from .criteria import *
 
 class Alternative_rel:
     weight = 1
@@ -87,6 +87,14 @@ class Alternative:
 def relateAlternatives(crit: Criteria, alt_one: Alternative, alt_two: Alternative, w_two_by_one: float):
     alt_one.addAlternativeRel_alt(crit, alt_two, w_two_by_one)
     alt_two.addAlternativeRel_alt(crit, alt_one, 1 / w_two_by_one)
+
+def alterAlternativesWeight(crit: Criteria, alt_one: Alternative, alt_two: Alternative, w_two_by_one: float):
+    for alt_rel in alt_one._alternative_relations:
+        if alt_rel.alt == alt_two and alt_rel.crit == crit:
+            alt_rel.weight = w_two_by_one
+    for alt_rel in alt_two._alternative_relations:
+        if alt_rel.alt == alt_one and alt_rel.crit == crit:
+            alt_rel.weight = (1 / w_two_by_one)
 
 def unrelateAlternatives(crit: Criteria, alt_one: Alternative, alt_two: Alternative):
     alt_one.rmAlternativeRel_alt(crit, alt_two)

@@ -1,5 +1,5 @@
-from alternative import *
-from criteria import *
+from core.alternative import *
+from core.criteria import *
 
 RANDOM_INDEX = [0, 0, 0.58, 0.89, 1.11, 1.24, 1.32, 1.4, 1.45, 1.49]
 VALID_UPPER_BOUND_CONSISTENCY_RELATION = 0.10
@@ -13,7 +13,7 @@ C3  p3  p6  99  pt3
 '''
 
 # calcular indice de consistencia para la matriz de criterios (tambien calcula las sumas y sus pesos)
-def calculate_CI(criteria_list: list(Criteria), sums: list(float), weights: list(float)) -> float:
+def calculate_CI(criteria_list: list[Criteria], sums: list[float], weights: list[float]) -> float:
     n_criteria = len(criteria_list)
     consistency_index = 0.0
     sums = []
@@ -46,7 +46,7 @@ def calculate_CI(criteria_list: list(Criteria), sums: list(float), weights: list
 
 
 # calcular indice de consistencia para la matriz de alternativas de un criterio (tambien calcula las sumas y sus pesos)
-def calculate_CI(criteria: Criteria, alternatives_list: list(Alternative), sums: list(float), weights: list(float)) -> float:
+def calculate_CI(criteria: Criteria, alternatives_list: list[Alternative], sums: list[float], weights: list[float]) -> float:
     n_alternatives = len(alternatives_list)
     consistency_index = 0.0
     sums = []
@@ -89,7 +89,7 @@ def check_Valid_CR(consistency_relation: float) -> float:
 
 
 # Calcula el valor final de la alternativa
-def calculate_Alt_Result(criteria_weights: list(float), alternative_weights_by_crit: list(float)) -> float:
+def calculate_Alt_Result(criteria_weights: list[float], alternative_weights_by_crit: list[float]) -> float:
     sum = 0.0
 
     for i in range(len(criteria_weights)):
@@ -99,5 +99,5 @@ def calculate_Alt_Result(criteria_weights: list(float), alternative_weights_by_c
 
 
 # Calcula el indice del mejor resultado de alternativa
-def calculate_Best_Alt(alternatives_results: list(float)) -> int:
+def calculate_Best_Alt(alternatives_results: list[float]) -> int:
     return alternatives_results.index(max(alternatives_results))
