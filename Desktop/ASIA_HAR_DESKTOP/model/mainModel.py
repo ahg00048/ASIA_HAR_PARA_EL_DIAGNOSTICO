@@ -6,8 +6,9 @@ class mainModel():
     def __init__(self):
         self._criteria = dm.get_all_crit()
         self._alternatives = dm.get_all_alt(self._criteria)
-        self._timeStart = 0.0
-        self._timeRange = 0.0    
+        time_tuple = dm.get_time()
+        self._timeStart = time_tuple[0]
+        self._timeRange = time_tuple[1]
 
     def getCriteria(self):
         return self._criteria.copy()
@@ -33,3 +34,6 @@ class mainModel():
 
     def getTime(self):
         return (self._timeStart, self._timeRange)
+
+    def saveTime(self):
+        dm.save_time(self._timeStart, self._timeRange)

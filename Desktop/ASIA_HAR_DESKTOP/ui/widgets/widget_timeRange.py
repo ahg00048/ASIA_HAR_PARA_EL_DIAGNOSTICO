@@ -1,6 +1,7 @@
 from PyQt6 import uic
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import QDateTime
+from datetime import datetime
 
 from ui.config import RESOURCES_DIR
 
@@ -17,8 +18,15 @@ class TimeRange(QWidget):
         self.startDateTime.dateTimeChanged.connect(self._clear_error)
         self.endDateTime.dateTimeChanged.connect(self._clear_error)
 
+        timestamp_tuple = self._model.getTime() 
+
+        self.startDateTime.setDateTime(QDateTime.fromSecsSinceEpoch(timestamp_tuple[0]))
+        self.endDateTime.setDateTime(QDateTime.fromSecsSinceEpoch(timestamp_tuple[0] + timestamp_tuple[1]))
+
+
     def _clear_error(self):
         self.errorLabel.setText("La fecha inicial tienes que ser antes que la final, y tiene que haber una diferencia de entre 30 min a 1 dia.")
+
 
     def validate_and_forward(self):
         start = self.startDateTime.dateTime().toPyDateTime()
@@ -38,11 +46,8 @@ class TimeRange(QWidget):
         
         start = start.timestamp()
         end = end.timestamp()
+
         self._model.setTime(start, end)
+        self._model.saveTime()
         # Si pasa las validaciones, llamar al callback con los valores
         self._callback_next()
-
-    def get_interval(self):
-        """Devuelve las fechas seleccionadas como objetos datetime."""
-        return (self.startDateTime.dateTime().toPyDateTime(),
-                self.endDateTime.dateTime().toPyDateTime())

@@ -5,6 +5,7 @@ import json
 
 _data_persistence = DATA['SUBDIR']['PERSISTENT']
 
+# crit and alt
 _all_name = _data_persistence['CRIT_ALT_DATA_NAME']
 _all_weight = _data_persistence['CRIT_ALT_DATA_REL_WEIGHT']
 _all_rel_crit = _data_persistence['CRIT_ALT_DATA_REL_CRIT']
@@ -16,10 +17,14 @@ _alt_set_name = _data_persistence['ALT_SET_NAME']
 _alt_rel_alt = _data_persistence['ALT_DATA_REL_ALT']
 _alt_rel = _data_persistence['ALT_DATA_REL']
 
+# time range
+_time_start = _data_persistence['TIME_START']
+_time_range = _data_persistence['TIME_RANGE']
+
 
 '''
 ===============================================================
-|               Obtaining values with dfs                     |
+|               Serializing to and from json                  |
 ===============================================================
 '''
 
@@ -185,3 +190,28 @@ def crit_list_from_json(alt_json) -> list[tuple[Criteria, list[dict]]]:
         crit_list.append((Criteria(crit_aux[_all_name]), crit_aux[_crit_rel]))
     
     return crit_list
+
+'''
+====================================================================================================================
+'''
+
+
+'''
+Function that converts time range into json
+'''
+def time_to_json(time_start: int, time_range: int):
+    time_dict = {
+        _time_start : time_start,
+        _time_range : time_range
+    }
+
+    return json.dumps(time_dict)
+
+
+'''
+Function that converts json into time range
+'''
+def time_from_json(time_json: str) -> tuple[int, int]:
+    time_dict = json.loads(time_json)
+
+    return (int(time_dict[_time_start]), int(time_dict[_time_range]))

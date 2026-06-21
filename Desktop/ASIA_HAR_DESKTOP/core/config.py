@@ -36,6 +36,8 @@ DATA = {
             'CRIT_DATA_BU' : 'save_crit_backup.json',
             'ALT_DATA' : 'save_alt.json',
             'ALT_DATA_BU' : 'save_alt_backup.json',
+            'TIME_DATA' : 'save_time_range.json',
+            'TIME_DATA_BU' : 'save_time_range_backup.json',
 
             'CRIT_SET_NAME' : 'criteria',
             'CRIT_ALT_DATA_NAME' : 'name',
@@ -45,7 +47,10 @@ DATA = {
 
             'ALT_SET_NAME' : 'alternatives',
             'ALT_DATA_REL_ALT' : 'alt',
-            'ALT_DATA_REL' : 'alternatives_relations'
+            'ALT_DATA_REL' : 'alternatives_relations',
+
+            'TIME_START' : 'time_start',
+            'TIME_RANGE' : 'time_range'
         }
     }
 }

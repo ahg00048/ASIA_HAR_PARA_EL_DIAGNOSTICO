@@ -1,10 +1,10 @@
 import sys
 from .config import *;
-from model.crit_alt import mainModel
+from model.mainModel import mainModel
 from PyQt6 import uic
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QStackedWidget
-from .widgets import widget_alternativesTable, widget_criteriaTable, widget_login, widget_patientsTable, widget_timeRange
+from .widgets import widget_alternativesTable, widget_criteriaTable, widget_timeRange
 
 class Main_window(QMainWindow):
     def __init__(self):
@@ -14,8 +14,6 @@ class Main_window(QMainWindow):
 
         self._model = mainModel()
         
-        self._login = widget_login.Login()
-        self._patientsList = widget_patientsTable.PatientsTable()
         self._timeRange = widget_timeRange.TimeRange(self.go_to_login, self.go_to_criteriaTable, self._model)
         self._criteriaTable = widget_criteriaTable.CriteriaTable(self.go_to_timeRange, self.go_to_alternativesTable, self._model)
         self._alternativesTable = widget_alternativesTable.AlternativesTable(self.go_to_criteriaTable, self.go_to_alternativesTable, self._model)

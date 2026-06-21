@@ -67,10 +67,13 @@ def removeLocalData(path):
 
 _data_persistence = DATA['SUBDIR']['PERSISTENT']
 
+# crit and alt
 _crit_data = _data_persistence['CRIT_DATA']
 _crit_data_bu = _data_persistence['CRIT_DATA_BU']
 _alt_data = _data_persistence['ALT_DATA']
 _alt_data_bu = _data_persistence['ALT_DATA_BU']
+_time_data = _data_persistence['TIME_DATA']
+_time_data_bu = _data_persistence['TIME_DATA_BU']
 
 _all_name = _data_persistence['CRIT_ALT_DATA_NAME']
 _all_weight = _data_persistence['CRIT_ALT_DATA_REL_WEIGHT']
@@ -81,6 +84,9 @@ _crit_rel = _data_persistence['CRIT_DATA_REL']
 _alt_rel_alt = _data_persistence['ALT_DATA_REL_ALT']
 _alt_rel = _data_persistence['ALT_DATA_REL']
 
+# time range
+_time_start = _data_persistence['TIME_START']
+_time_start = _data_persistence['TIME_RANGE']
 
 #=================================================================
 
@@ -88,7 +94,13 @@ def get_all_crit(backup = False):
     criteria_aux = []
 
     data_path = (_crit_data if not backup else _crit_data_bu)
-    with open(_path_data_persist / data_path) as f:
+
+    try:
+        f = open(_path_data_persist / data_path, "r")
+    except OSError:
+        return criteria_aux
+    
+    with f:
         f_content = f.read()
         criteria_aux = crit_list_from_json(f_content)
 
@@ -112,7 +124,13 @@ def save_all_crit(criteria: list[Criteria], backup = False):
     file_content = crit_list_to_json(criteria)
 
     data_path = (_crit_data if not backup else _crit_data_bu)
-    with open(_path_data_persist / data_path, "w") as f:
+
+    try:
+        f = open(_path_data_persist / data_path, "w")
+    except OSError:
+        return 
+    
+    with f:
         f.write(file_content)
 
 
@@ -122,7 +140,13 @@ def get_all_alt(criteria: list[Criteria], backup = False):
     alternatives_aux = []
 
     data_path = (_alt_data if not backup else _alt_data_bu)
-    with open(_path_data_persist / data_path) as f:
+
+    try:
+        f = open(_path_data_persist / data_path, "r")
+    except OSError:
+        return alternatives_aux
+
+    with f:
         f_content = f.read()
         alternatives_aux = alt_list_from_json(f_content)
 
@@ -153,7 +177,44 @@ def save_all_alt(alternatives: list[Alternative], backup = False):
     file_content = alt_list_to_json(alternatives)
 
     data_path = (_alt_data if not backup else _alt_data_bu)
-    with open(_path_data_persist / data_path, "w") as f:
+
+    try:
+        f = open(_path_data_persist / data_path, "w")
+    except OSError:
+        return 
+    
+    with f:
+        f.write(file_content)
+
+
+#=================================================================
+
+def get_time(backup = False):
+    data_path = (_time_data if not backup else _time_data_bu)
+
+    try:
+        f = open(_path_data_persist / data_path, "r")
+    except OSError:
+        return (0, 0)
+
+    with f:
+        f_content = f.read()
+        time_tuple = time_from_json(f_content)
+
+    return time_tuple
+
+
+def save_time(time_start, time_range, backup = False):
+    file_content = time_to_json(time_start, time_range)
+
+    data_path = (_time_data if not backup else _time_data_bu)
+    
+    try:
+        f = open(_path_data_persist / data_path, "w")
+    except OSError:
+        return
+
+    with f:
         f.write(file_content)
 
 
