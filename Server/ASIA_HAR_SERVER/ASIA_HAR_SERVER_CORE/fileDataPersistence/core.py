@@ -101,8 +101,6 @@ def cullDataFromTimeRange(data_frames, time_start_in_seconds, time_range_in_seco
         new_df.drop(index=df.index[final_index:], inplace=True)
 
         new_data_frames[key] = new_df
-        print(init_index, final_index)
-        print(time_start_in_seconds, time_end_in_seconds, time_range_in_seconds)
 
     return new_data_frames
 

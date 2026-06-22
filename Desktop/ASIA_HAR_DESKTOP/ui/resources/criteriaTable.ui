@@ -265,7 +265,7 @@
         <string>Siguiente →</string>
        </property>
        <property name="toolTip">
-        <string>Avanzar a la tabla de alternativas</string>
+        <string>Avanzar a la siguiente vista</string>
        </property>
       </widget>
      </item>

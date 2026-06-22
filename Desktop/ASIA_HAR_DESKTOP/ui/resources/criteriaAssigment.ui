@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Widget_CriteriaParameters</class>
+ <widget class="QWidget" name="Widget_CriteriaParameters">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>560</width>
+    <height>520</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Parámetros y métodos por criterio</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QWidget {
+        background-color: #F5FCFC;
+        font-family: "Segoe UI", "Roboto", sans-serif;
+        font-size: 14px;
+        color: #2C3E50;
+    }
+    QLabel#titleLabel {
+        font-size: 18px;
+        font-weight: bold;
+        color: #1C7C7C;
+        padding: 8px;
+    }
+    QScrollArea {
+        border: none;
+        background-color: transparent;
+    }
+    QGroupBox {
+        background-color: #FFFFFF;
+        border: 1px solid #B2DFDB;
+        border-radius: 8px;
+        margin-top: 12px;
+        padding-top: 16px;
+        font-weight: bold;
+        color: #00695C;
+    }
+    QGroupBox::title {
+        subcontrol-origin: margin;
+        subcontrol-position: top left;
+        padding: 4px 12px;
+        background-color: #E0F2F1;
+        border-radius: 4px;
+        color: #004D40;
+    }
+    QComboBox {
+        background-color: #FFFFFF;
+        border: 1px solid #B2DFDB;
+        border-radius: 4px;
+        padding: 4px 8px;
+        color: #2C3E50;
+    }
+    QComboBox:focus {
+        border: 1px solid #26A69A;
+    }
+    QLabel#outputLabel {
+        color: #00695C;
+        font-style: italic;
+        padding: 2px;
+    }
+    QPushButton {
+        background-color: #26A69A;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-weight: bold;
+    }
+    QPushButton:hover {
+        background-color: #00897B;
+    }
+    QPushButton:pressed {
+        background-color: #00796B;
+    }
+    QPushButton#backButton {
+        background-color: #80CBC4;
+    }
+    QPushButton#backButton:hover {
+        background-color: #4DB6AC;
+    }
+    QPushButton#saveButton {
+        background-color: #26A69A;
+    }
+    QPushButton#saveButton:hover {
+        background-color: #00897B;
+    }
+    QPushButton#nextButton {
+        background-color: #009688;
+    }
+    QPushButton#nextButton:hover {
+        background-color: #00796B;
+    }
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>12</number>
+   </property>
+   <property name="leftMargin">
+    <number>20</number>
+   </property>
+   <property name="topMargin">
+    <number>20</number>
+   </property>
+   <property name="rightMargin">
+    <number>20</number>
+   </property>
+   <property name="bottomMargin">
+    <number>20</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="titleLabel">
+     <property name="text">
+      <string>Configuración de parámetros y métodos por criterio</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="criteriaContainer">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>536</width>
+        <height>300</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="criteriaLayout">
+       <property name="spacing">
+        <number>12</number>
+       </property>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="navigationLayout">
+     <property name="spacing">
+      <number>12</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="backButton">
+       <property name="text">
+        <string>← Volver</string>
+       </property>
+       <property name="toolTip">
+        <string>Regresar a la vista anterior</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveButton">
+       <property name="text">
+        <string>💾 Guardar</string>
+       </property>
+       <property name="toolTip">
+        <string>Guardar la configuración actual</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="nextButton">
+       <property name="text">
+        <string>Siguiente →</string>
+       </property>
+       <property name="toolTip">
+        <string>Continuar al siguiente paso</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -214,4 +214,23 @@ Function that converts json into time range
 def time_from_json(time_json: str) -> tuple[int, int]:
     time_dict = json.loads(time_json)
 
+    if _time_start not in time_dict or _time_range not in time_dict:
+        return (0, 0)
+
     return (int(time_dict[_time_start]), int(time_dict[_time_range]))
+
+
+'''
+====================================================================================================================
+'''
+
+'''
+Function that returns named string list from json 
+'''
+def str_list_from_json(name: str) -> list[str]:
+    dict = json.loads(name)
+
+    if name not in dict:
+        return []
+
+    return dict[name]

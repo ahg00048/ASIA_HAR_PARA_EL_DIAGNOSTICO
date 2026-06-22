@@ -1,6 +1,6 @@
 import simpful as sf
 
-Fuzzy_System = sf.FuzzySystem()
+Core_Fuzzy_System = sf.FuzzySystem()
 
 '''
 +===========================================================+

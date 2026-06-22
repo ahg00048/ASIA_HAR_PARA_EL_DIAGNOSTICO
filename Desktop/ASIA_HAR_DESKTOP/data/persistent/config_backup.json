@@ -1,0 +1,11 @@
+{
+    "dfs_exclude_properties" :
+    [
+        "id_house",
+        "id_beacon",
+        "id_sensor",
+        "id_anchor",
+        "battery",
+        "timestamp"
+    ]
+}

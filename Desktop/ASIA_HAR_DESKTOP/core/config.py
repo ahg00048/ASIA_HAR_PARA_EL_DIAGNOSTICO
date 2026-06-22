@@ -32,6 +32,10 @@ DATA = {
         'TEMP' : 'temp/',
         'PERSISTENT' : {
             'NAME' : 'persistent/',
+
+            'CONFIG' : 'config.json',
+            'CONFIG_BU' : 'config_backup.json',
+
             'CRIT_DATA' : 'save_crit.json',
             'CRIT_DATA_BU' : 'save_crit_backup.json',
             'ALT_DATA' : 'save_alt.json',
@@ -50,7 +54,10 @@ DATA = {
             'ALT_DATA_REL' : 'alternatives_relations',
 
             'TIME_START' : 'time_start',
-            'TIME_RANGE' : 'time_range'
+            'TIME_RANGE' : 'time_range',
+
+            'DFS_EXCLUDE' : 'dfs_exclude_properties'
+
         }
     }
 }

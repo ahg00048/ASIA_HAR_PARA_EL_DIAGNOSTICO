@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QTableWidgetItem, QInputDialog
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QEvent
 from PyQt6 import uic
 
 from ui.config import RESOURCES_DIR
@@ -21,9 +21,12 @@ class CriteriaTable(QWidget):
         self.addCriterionButton.clicked.connect(self.add_criterion)
         self.removeCriterionButton.clicked.connect(self.remove_criterion)
 
+        self._callback_nextButton = callback_nextButton
+        self._callback_backButton = callback_backButton
+
         self.saveButton.clicked.connect(self.criteria_save_current_config)
-        self.backButton.clicked.connect(callback_backButton)
-        self.nextButton.clicked.connect(callback_nextButton)
+        self.backButton.clicked.connect(self.button_wrapper_backButton)
+        self.nextButton.clicked.connect(self.button_wrapper_nextButton)
 
         # Reciprocidad al editar celdas
         self.tableWidget.cellChanged.connect(self._on_cell_changed)
@@ -33,6 +36,26 @@ class CriteriaTable(QWidget):
         self.tableWidget.verticalHeader().setSectionsClickable(True)
         self.tableWidget.horizontalHeader().sectionDoubleClicked.connect(self.edit_criterion_name)
         self.tableWidget.verticalHeader().sectionDoubleClicked.connect(self.edit_criterion_name)
+    
+        self.nextButton.installEventFilter(self)
+        self.backButton.installEventFilter(self)
+
+    # ------------------------------------------------------------------
+    # Filtro de eventos para cambiar tooltip según condición en hover
+    # ------------------------------------------------------------------
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Type.ToolTip:
+            if obj == self.nextButton:
+                # Condición: si los datos no están listos y hay carga en curso
+                if self._model.errorObtainingDFs():
+                    self.nextButton.setToolTip("Error de conexión. Inténtelo de nuevo más tarde.")
+                elif self._model.getDataframes() is None:
+                    self.nextButton.setToolTip("Espere mientras se obtienen los datos…")
+                else:
+                    self.nextButton.setToolTip("Avanzar a la siguiente vista")
+                return False  # ya manejamos el evento
+
+        return super().eventFilter(obj, event)
 
     # ------------------------------------------------------------------
     # Construcción / reconstrucción de la tabla desde el modelo
@@ -180,5 +203,18 @@ class CriteriaTable(QWidget):
         table.item(col, row).setText(self._format_ahp_weight(w_col_row))
         self._updating = False
 
+
     def criteria_save_current_config(self):
         self._model.saveCriteria()
+
+
+    def button_wrapper_nextButton(self):
+        if self._model.getDataframes() is None:
+            return
+        
+        self._callback_nextButton()
+        
+
+    def button_wrapper_backButton(self):
+        self._model.cancelDataframes()        
+        self._callback_backButton()

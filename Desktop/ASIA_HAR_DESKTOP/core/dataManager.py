@@ -3,6 +3,9 @@ from core.serializer_utils import *
 import os
 import pandas as pd
 import requests
+import asyncio
+import aiohttp
+import aiofiles
 from zipfile import ZipFile
 
 
@@ -25,28 +28,35 @@ _url_example = API_HOST['URLs'][EXAMPLE]
 '''
 
 # Obtiene el zip dado una url de la api y su id de hogar, y lo almacena en temp
-def retrieveRemoteData_Zip(url, house_id):
-    response = requests.get(url, stream=True)
-    
-    if response.status_code == requests.status_codes._codes[204]:
-        return INVALID_PATH
+async def retrieveRemoteData_Zip(url, house_id):    
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status == 204:
+                return INVALID_PATH
 
-    zip_filename = _path_data_temp / 'house_{0}.zip'.format(house_id)
+            zip_filename = _path_data_temp / 'house_{0}.zip'.format(house_id)
 
-    with open(zip_filename, 'wb') as zip_file:
-        for chunk in response.iter_content(chunk_size=255): 
-            if chunk:
-                zip_file.write(chunk)
+            async with aiofiles.open(zip_filename, 'wb') as zip_file:
+                async for chunk in response.content.iter_chunked(255): 
+                    await zip_file.write(chunk)
 
     return zip_filename
 
 
 # Obtiene el los archivos csv del zip en el sistema de archivos local
 def retrieveDataFrames_Zip(path):
-    zip_f = ZipFile(path)
-
-    data_frames = {text_file.filename : pd.read_csv(zip_f.open(text_file.filename)) 
-            for text_file in zip_f.infolist() if text_file.filename.endswith('.csv')}
+    # with ZipFile(path) as zip_f:
+    #     data_frames = {
+    #         text_file.filename: pd.read_csv(zip_f.open(text_file.filename))
+    #         for text_file in zip_f.infolist()
+    #         if text_file.filename.endswith('.csv')
+    #     }    
+    with ZipFile(path) as zip_f:
+        data_frames = {}
+        for text_file in zip_f.infolist():
+            if text_file.filename.endswith('.csv'):
+                with zip_f.open(text_file) as csv_file:
+                    data_frames[text_file.filename] = pd.read_csv(csv_file)
 
     return data_frames
 
@@ -66,6 +76,12 @@ def removeLocalData(path):
 '''
 
 _data_persistence = DATA['SUBDIR']['PERSISTENT']
+
+# config
+_config = _data_persistence['CONFIG']
+_config_bu = _data_persistence['CONFIG_BU']
+
+_dfs_exclude = _data_persistence['DFS_EXCLUDE']
 
 # crit and alt
 _crit_data = _data_persistence['CRIT_DATA']
@@ -218,19 +234,43 @@ def save_time(time_start, time_range, backup = False):
         f.write(file_content)
 
 
+#=================================================================
+
+
+def get_config_dfs_excludedParameters(backup = False):
+    data_path = (_config if not backup else _config_bu)
+
+    try:
+        f = open(_path_data_persist / data_path, "r")
+    except OSError:
+        return []
+        
+    with f:
+        f_content = f.read()
+        exclude_params = str_list_from_json(f_content)
+
+    return exclude_params
+
+
+
 '''
 ========================================================================================
 '''
 
 # Obtiene los datos de ejemplo
-def retrieveDataExample():
+async def retrieveDataExample(time_start, time_range):
     house_id = 2
-    url = _url_api_root + _url_example + '?house_id={0}&time_range_in_seconds={1}'
-    url = url.format(house_id, 86400)
-    print(url)
+    url = _url_api_root + _url_example + '?house_id={0}&time_start_in_seconds={1}&time_range_in_seconds={2}'
+    url = url.format(house_id, time_start, time_range)
 
-    zip_filename = retrieveRemoteData_Zip(url, house_id)
+    # Ahora se espera correctamente el resultado asíncrono
+    zip_filename = await retrieveRemoteData_Zip(url, house_id)
+
+    if zip_filename == INVALID_PATH:
+        raise Exception()
 
     dfs = retrieveDataFrames_Zip(zip_filename)
-
-    removeLocalData(zip_filename)   
+    
+    removeLocalData(zip_filename)
+    
+    return dfs

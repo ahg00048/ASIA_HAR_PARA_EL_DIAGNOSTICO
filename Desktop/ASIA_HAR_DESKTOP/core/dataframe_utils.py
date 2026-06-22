@@ -86,3 +86,7 @@ def dataFrames_list(df: pd.DataFrame, property: str) -> list:
         return None
 
     return values
+
+
+def dataFrames_properties(df: pd.DataFrame) -> list[str]:
+    return df.columns[0].copy()
