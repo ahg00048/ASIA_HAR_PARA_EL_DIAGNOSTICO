@@ -75,8 +75,8 @@ class Criteria:
     def __str__(self):
         return "Criteria {0} -> Weights: {1}".format(self.name, self._criteria_relations)
 
-    def __eq__(self, value):
-        return self.name == value.name
+    def __eq__(self, other):
+        return self.name == other.name
 
 # funciones
 

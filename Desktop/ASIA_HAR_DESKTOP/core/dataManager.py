@@ -86,6 +86,10 @@ _dfs_exclude = _data_persistence['DFS_EXCLUDE']
 # crit and alt
 _crit_data = _data_persistence['CRIT_DATA']
 _crit_data_bu = _data_persistence['CRIT_DATA_BU']
+_crit_data_params = _data_persistence['CRIT_DATA_PARAMS']
+_crit_data_params_bu = _data_persistence['CRIT_DATA_PARAMS_BU']
+_alt_data_params = _data_persistence['ALT_DATA_PARAMS']
+_alt_data_params_bu = _data_persistence['ALT_DATA_PARAMS_BU']
 _alt_data = _data_persistence['ALT_DATA']
 _alt_data_bu = _data_persistence['ALT_DATA_BU']
 _time_data = _data_persistence['TIME_DATA']
@@ -96,6 +100,9 @@ _all_weight = _data_persistence['CRIT_ALT_DATA_REL_WEIGHT']
 _all_rel_crit = _data_persistence['CRIT_ALT_DATA_REL_CRIT']
 
 _crit_rel = _data_persistence['CRIT_DATA_REL']
+
+_alt_param_set_name = _data_persistence['ALT_PARAM_SET_NAME']
+_alt_param_func = _data_persistence['ALT_PARAM_DATA_FUNC']
 
 _alt_rel_alt = _data_persistence['ALT_DATA_REL_ALT']
 _alt_rel = _data_persistence['ALT_DATA_REL']
@@ -149,6 +156,37 @@ def save_all_crit(criteria: list[Criteria], backup = False):
     with f:
         f.write(file_content)
 
+#=================================================================
+
+def get_all_crit_data_param(backup = False):
+    criteria_p = [] 
+    
+    data_path = (_crit_data_params if not backup else _crit_data_params_bu)
+
+    try:
+        f = open(_path_data_persist / data_path, "r")
+    except OSError:
+        return criteria_p
+    
+    with f:
+        f_content = f.read()
+        criteria_p = crit_param_list_from_json(f_content)
+
+    return criteria_p
+
+
+def save_all_crit_data_param(criteria_p: list[CriteriaDataParams], backup = False):
+    file_content = crit_param_list_to_json(criteria_p)
+
+    data_path = (_crit_data_params if not backup else _crit_data_params_bu)
+
+    try:
+        f = open(_path_data_persist / data_path, "w")
+    except OSError:
+        return 
+    
+    with f:
+        f.write(file_content)
 
 #=================================================================
 
@@ -193,6 +231,38 @@ def save_all_alt(alternatives: list[Alternative], backup = False):
     file_content = alt_list_to_json(alternatives)
 
     data_path = (_alt_data if not backup else _alt_data_bu)
+
+    try:
+        f = open(_path_data_persist / data_path, "w")
+    except OSError:
+        return 
+    
+    with f:
+        f.write(file_content)
+
+#=================================================================
+
+def get_all_alt_data_param(backup = False):
+    alternatives_p = [] 
+    
+    data_path = (_alt_data_params if not backup else _alt_data_params_bu)
+
+    try:
+        f = open(_path_data_persist / data_path, "r")
+    except OSError:
+        return alternatives_p
+    
+    with f:
+        f_content = f.read()
+        alternatives_p = alt_param_list_from_json(f_content)
+
+    return alternatives_p
+
+
+def save_all_alt_data_param(alternatives_p: list[CriteriaDataParams], backup = False):
+    file_content = alt_param_list_to_json(alternatives_p)
+
+    data_path = (_alt_data_params if not backup else _alt_data_params_bu)
 
     try:
         f = open(_path_data_persist / data_path, "w")
@@ -247,7 +317,7 @@ def get_config_dfs_excludedParameters(backup = False):
         
     with f:
         f_content = f.read()
-        exclude_params = str_list_from_json(f_content)
+        exclude_params = str_list_from_json(_dfs_exclude, f_content)
 
     return exclude_params
 

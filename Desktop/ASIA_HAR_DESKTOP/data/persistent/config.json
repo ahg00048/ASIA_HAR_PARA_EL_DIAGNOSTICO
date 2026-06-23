@@ -6,6 +6,7 @@
         "id_sensor",
         "id_anchor",
         "battery",
-        "timestamp"
+        "timestamp",
+        "Unnamed"
     ]
 }

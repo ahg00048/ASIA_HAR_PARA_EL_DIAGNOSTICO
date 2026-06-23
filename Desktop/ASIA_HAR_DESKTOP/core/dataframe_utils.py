@@ -6,6 +6,9 @@ import pandas as pd
 |               Obtaining values with dfs                     |
 ===============================================================
 '''
+_on = 'on'
+_off = 'off'
+
 
 def dataFrames_min_max(df: pd.DataFrame, property: str) -> tuple:
     min = float('inf')
@@ -14,6 +17,13 @@ def dataFrames_min_max(df: pd.DataFrame, property: str) -> tuple:
     try:
         for (idx, row) in df.iterrows():
             value = row.loc[property]
+
+            if isinstance(value, str):
+                if value == _on:
+                    value = 1.0
+                else:
+                    value = 0.0
+                
             if value < min:
                 min = value
             if value > max:
@@ -30,6 +40,13 @@ def dataFrames_max(df: pd.DataFrame, property: str) -> float:
     try:
         for (idx, row) in df.iterrows():
             value = row.loc[property]
+
+            if isinstance(value, str):
+                if value == _on:
+                    value = 1.0
+                else:
+                    value = 0.0
+                
             if value > max:
                 max = value
     except KeyError:
@@ -44,6 +61,13 @@ def dataFrames_min(df: pd.DataFrame, property: str) -> float:
     try:
         for (idx, row) in df.iterrows():
             value = row.loc[property]
+
+            if isinstance(value, str):
+                if value == _on:
+                    value = 1.0
+                else:
+                    value = 0.0
+                
             if value < min:
                 min = value
     except KeyError:
@@ -57,7 +81,15 @@ def dataFrames_sum(df: pd.DataFrame, property: str) -> float:
 
     try:
         for (idx, row) in df.iterrows():
-            sum += row.loc[property]
+            value = row.loc[property]
+
+            if isinstance(value, str):
+                if value == _on:
+                    value = 1.0
+                else:
+                    value = 0.0
+                
+            sum += value
     except KeyError:
         return None
 
@@ -69,7 +101,15 @@ def dataFrames_mean(df: pd.DataFrame, property: str) -> float:
     
     try:
         for (idx, row) in df.iterrows():
-            sum += row.loc[property]
+            value = row.loc[property]
+
+            if isinstance(value, str):
+                if value == _on:
+                    value = 1.0
+                else:
+                    value = 0.0
+                
+            sum += value
     except KeyError:
         return None
 
@@ -89,4 +129,4 @@ def dataFrames_list(df: pd.DataFrame, property: str) -> list:
 
 
 def dataFrames_properties(df: pd.DataFrame) -> list[str]:
-    return df.columns[0].copy()
+    return df.columns

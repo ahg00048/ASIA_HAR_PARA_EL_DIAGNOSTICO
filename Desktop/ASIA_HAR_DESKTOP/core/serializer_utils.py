@@ -1,5 +1,7 @@
 from core.alternative import *
 from core.criteria import *
+from core.criteria_data_params import *
+from core.alternatives_data_params import *
 from core.config import DATA
 import json
 
@@ -12,6 +14,13 @@ _all_rel_crit = _data_persistence['CRIT_ALT_DATA_REL_CRIT']
 
 _crit_set_name = _data_persistence['CRIT_SET_NAME']
 _crit_rel = _data_persistence['CRIT_DATA_REL']
+
+_alt_param_set_name = _data_persistence['CRIT_PARAM_SET_NAME']
+_crit_param_method = _data_persistence['CRIT_PARAM_DATA_METHOD']
+_crit_param_param = _data_persistence['CRIT_PARAM_DATA_PARAM']
+
+_alt_param_set_name = _data_persistence['ALT_PARAM_SET_NAME']
+_alt_param_func = _data_persistence['ALT_PARAM_DATA_FUNC']
 
 _alt_set_name = _data_persistence['ALT_SET_NAME']
 _alt_rel_alt = _data_persistence['ALT_DATA_REL_ALT']
@@ -110,6 +119,50 @@ def alt_list_from_json(alt_json) -> list[tuple[Alternative, list[dict]]]:
     
     return alt_list
 
+'''
+====================================================================================================================
+'''
+
+
+'''
+Function that converts alternatives params to json string
+'''
+def alt_param_list_to_json(alt_params: list[AlternativesDataParams]):
+    alt_param_list = []
+    
+    for alt_p in alt_params:
+        dict = {
+            _alt_rel_alt : alt_p.alt,
+            _all_rel_crit : alt_p.crit,
+            _alt_param_func : alt_p.func
+        }
+
+        alt_param_list.append(dict.copy())
+
+    return json.dumps({_alt_param_set_name : alt_param_list})
+
+
+'''
+Function that converts json string to list of alternatives
+Returns the list of tuples of alternatives data parameters without the relation to the criteria
+'''
+def alt_param_list_from_json(alt_param_json) -> list[AlternativesDataParams]:
+    alt_param_list = []
+    
+    alt_param_list_aux = json.loads(alt_param_json)
+    if _alt_param_set_name not in alt_param_list_aux:
+        return []
+
+    for alt_param_aux in alt_param_list_aux[_alt_param_set_name]:
+        alt_param_list.append(AlternativesDataParams(alt_param_aux[_alt_rel_alt], alt_param_aux[_all_rel_crit], alt_param_aux[_alt_param_func]))
+    
+    return alt_param_list
+
+
+'''
+====================================================================================================================
+'''
+
 
 '''
 Function that converts criteria to json string
@@ -191,6 +244,47 @@ def crit_list_from_json(alt_json) -> list[tuple[Criteria, list[dict]]]:
     
     return crit_list
 
+
+'''
+====================================================================================================================
+'''
+
+
+'''
+Function that converts criteria params to json string
+'''
+def crit_param_list_to_json(crit_params: list[CriteriaDataParams]):
+    crit_param_list = []
+    
+    for crit_p in crit_params:
+        dict = {
+            _all_rel_crit : crit_p.crit,
+            _crit_param_param : crit_p.param,
+            _crit_param_method : crit_p.method
+        }
+
+        crit_param_list.append(dict.copy())
+
+    return json.dumps({_alt_param_set_name : crit_param_list})
+
+
+'''
+Function that converts json string to list of criteria
+Returns the list of tuples of criteria data parameters without the relation to the criteria
+'''
+def crit_param_list_from_json(crit_param_json) -> list[CriteriaDataParams]:
+    crit_param_list = []
+    
+    crit_param_list_aux = json.loads(crit_param_json)
+    if _alt_param_set_name not in crit_param_list_aux:
+        return []
+
+    for crit_param_aux in crit_param_list_aux[_alt_param_set_name]:
+        crit_param_list.append(CriteriaDataParams(crit_param_aux[_crit_param_param], crit_param_aux[_crit_param_method], crit_param_aux[_all_rel_crit]))
+    
+    return crit_param_list
+
+
 '''
 ====================================================================================================================
 '''
@@ -227,8 +321,8 @@ def time_from_json(time_json: str) -> tuple[int, int]:
 '''
 Function that returns named string list from json 
 '''
-def str_list_from_json(name: str) -> list[str]:
-    dict = json.loads(name)
+def str_list_from_json(name: str, content: str) -> list[str]:
+    dict = json.loads(content)
 
     if name not in dict:
         return []

@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QWidget, QGroupBox, QVBoxLayout, QLabel, QComboBox, 
 from PyQt6.QtCore import Qt
 
 from ui.config import RESOURCES_DIR
+from core.criteria_data_params import CriteriaDataParams
 from core.criteria import Criteria, relateCriterias, alterCriteriasWeight, unrelateCriterias
 
 class CriteriaAssigment(QWidget):
@@ -13,13 +14,11 @@ class CriteriaAssigment(QWidget):
         self._model = model
         self._rows = []  
 
-        self._build_rows()
-
         self.backButton.clicked.connect(callback_backButton)
         self.nextButton.clicked.connect(callback_nextButton)
         self.saveButton.clicked.connect(self.save_config)
 
-    def _build_rows(self):
+    def build_rows(self):
         """Crea una fila por cada criterio con dos combos y una etiqueta de salida."""
         layout = self.criteriaContainer.layout()
 
@@ -29,9 +28,10 @@ class CriteriaAssigment(QWidget):
                 child.widget().deleteLater()
         self._rows.clear()
 
-        criteria = self._model.getCriteria()  # lista de objetos Criteria
-        parametros = ["Temperatura", "Humedad", "Presión", "Luz", "Movimiento"]
-        metodos = ["Media", "Máximo", "Mínimo", "Desviación", "Último valor"]
+        criteria = self._model.getCriteria()  
+        criteria_params = self._model.getCriteriaParams()
+        params = self._model.getDfsValidProperties()
+        methods = self._model.getDfsMethods()
 
         for crit in criteria:
             group = QGroupBox(f"Criterio: {crit.name}")
@@ -40,9 +40,20 @@ class CriteriaAssigment(QWidget):
             # Fila con combos
             hbox = QHBoxLayout()
             combo_param = QComboBox()
-            combo_param.addItems(parametros)
+            combo_param.addItems(params)
             combo_metodo = QComboBox()
-            combo_metodo.addItems(metodos)
+            combo_metodo.addItems(methods)
+
+            default_param = params[0]   
+            default_method = methods[0]
+            for cp in criteria_params:
+                if cp.crit == crit.name:   
+                    default_param = cp.param
+                    default_method = cp.method
+                    break
+
+            combo_param.setCurrentText(default_param)
+            combo_metodo.setCurrentText(default_method)
 
             hbox.addWidget(QLabel("Parámetro:"))
             hbox.addWidget(combo_param)
@@ -76,19 +87,17 @@ class CriteriaAssigment(QWidget):
         param = combo_param.currentText()
         metodo = combo_metodo.currentText()
         output_label.setText(f"{param} → {metodo}")
+        
+        criteria_param = []
+        for crit, cp, cm, _ in self._rows:
+            criteria_param.append(CriteriaDataParams(cp.currentText(), cm.currentText(), crit.name))
+        self._model.updateCriteriaParams(criteria_param)
+
 
     def save_config(self):
-        # Aquí guardarías las selecciones en el modelo o un archivo
-        config = []
+        criteria_param = []
         for crit, cp, cm, _ in self._rows:
-            config.append({
-                "criterio": crit.name,
-                "parametro": cp.currentText(),
-                "metodo": cm.currentText()
-            })
-        # Ejemplo: self._model.saveParametersConfig(config)
-        print("Configuración guardada:", config)
+            criteria_param.append(CriteriaDataParams(cp.currentText(), cm.currentText(), crit.name))
 
-    def get_selections(self):
-        """Devuelve un diccionario con las selecciones actuales."""
-        return {crit.name: (cp.currentText(), cm.currentText()) for crit, cp, cm, _ in self._rows}
+        self._model.updateCriteriaParams(criteria_param)
+        self._model.saveCriteriaParams()

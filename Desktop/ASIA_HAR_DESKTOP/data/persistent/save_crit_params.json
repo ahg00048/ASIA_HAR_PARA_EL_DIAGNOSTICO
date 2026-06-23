@@ -1,0 +1,1 @@
+{"alternatives_data_params": [{"crit": "Cantidad de pasos", "param": "steps", "method": "Max"}, {"crit": "Actividad nocturna", "param": "steps", "method": "Media"}, {"crit": "N\u00ba de aperturas de puertas", "param": "state", "method": "Media"}]}

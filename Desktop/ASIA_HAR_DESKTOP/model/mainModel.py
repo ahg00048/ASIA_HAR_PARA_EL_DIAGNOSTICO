@@ -1,7 +1,6 @@
 import asyncio
 
-from core import ahp_analysis, criteria
-from core import alternative
+from core import ahp_analysis, criteria, alternative, criteria_data_params
 import core.dataframe_utils as dtf_utils
 import core.dataManager as dm
 
@@ -10,15 +9,16 @@ class mainModel():
         time_tuple = dm.get_time()
         
         self._criteria = dm.get_all_crit()
+        self._criteriaParams = dm.get_all_crit_data_param()
         self._alternatives = dm.get_all_alt(self._criteria)
-        
+        self._alternativesParams = dm.get_all_alt_data_param()
+
         self._timeStart = time_tuple[0]
         self._timeRange = time_tuple[1]
         
         self._dataFrames = None
         self._task_dfs = None
         self._loadingDFs = False
-
         self._unableToConnectToServer = False
 
 # Alts and Crit
@@ -26,8 +26,15 @@ class mainModel():
     def getCriteria(self):
         return self._criteria.copy()
 
+    def getCriteriaParams(self):
+        return self._criteriaParams.copy()
+
     def getAlternatives(self):
         return self._alternatives.copy()
+    
+    def getAlternativesParams(self):
+        return self._alternativesParams.copy()
+
 
     def updateCriteria(self, criteria):
         self._criteria = criteria
@@ -35,11 +42,26 @@ class mainModel():
     def saveCriteria(self):
         dm.save_all_crit(self._criteria)
 
+
+    def updateCriteriaParams(self, criteriaParams):
+        self._criteriaParams = criteriaParams
+
+    def saveCriteriaParams(self):
+        dm.save_all_crit_data_param(self._criteriaParams)
+
+
     def updateAlternatives(self, alternatives):
-        self._alternative = alternatives
+        self._alternatives = alternatives
 
     def saveAlternatives(self):
         dm.save_all_alt(self._alternatives)
+
+        
+    def updateAlternativesParams(self, alternativesParams):
+        self._alternativesParams = alternativesParams
+
+    def saveAlternativesParams(self):
+        dm.save_all_alt_data_param(self._alternativesParams)
 
 # Time
 
@@ -85,7 +107,20 @@ class mainModel():
         self._loadingDFs = False
         self._dataFrames = None
 
-    def getDfsValidProperties():
+    def getDfsValidProperties(self): 
+        if self._dataFrames is None:
+            return []
+
         excludedProps = dm.get_config_dfs_excludedParameters()
-        
-        return [ x for x in dtf_utils.dataFrames_properties() if x not in excludedProps ]
+        validProps = []
+
+        for df in self._dataFrames.values():
+            df_props = dtf_utils.dataFrames_properties(df)
+            for prop in df_props:
+                if all(x not in prop for x in excludedProps) and prop not in validProps: 
+                    validProps.append(prop)
+
+        return validProps
+
+    def getDfsMethods(self):
+        return ["Media", "Max", "Min", "Suma"]
