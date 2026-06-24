@@ -6,7 +6,6 @@ import zipfile
 import pandas as pd
 import numpy as np
 
-TEMP_USED = []
 
 def removeFiles(filePaths):
     for file in filePaths:
@@ -127,7 +126,6 @@ def makeZipFromDataFrames(data_frames, path, subdir_format, house_id):
 # Public =================================================================0
 
 def retrieveData_Test(house_id: int, time_start_in_seconds, time_range_in_seconds):
-    removeFiles(TEMP_USED)
     dataRootDir = DATASETS_TEST['DIR']
     dataSubDirs = DATASETS_TEST['SUBDIRS_FORMAT'] 
     dataFilesFormat = DATASETS_TEST['FILES_FORMAT'] # list
@@ -153,5 +151,4 @@ def retrieveData_Test(house_id: int, time_start_in_seconds, time_range_in_second
     path_format = "%s/%s{0}/%s/" % (dataRootDir, dataSubDirs, TEMP_DIR)
     resultPath = makeZipFromDataFrames(dfs, path_format.format(house_id), dataSubDirs, house_id)
 
-    TEMP_USED.append(resultPath)
     return resultPath
