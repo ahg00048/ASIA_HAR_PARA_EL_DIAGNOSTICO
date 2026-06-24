@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Widget_CriteriaTableWidget</class>
- <widget class="QWidget" name="Widget_CriteriaTableWidget">
+ <class>CriteriaTable</class>
+ <widget class="QWidget" name="CriteriaTable">
   <property name="geometry">
    <rect>
     <x>0</x>

@@ -1,25 +1,40 @@
 import simpful as sf
 
-Core_Fuzzy_System = sf.FuzzySystem()
 
 '''
 +===========================================================+
-| PRESET DE VARIABLES LINGUISTICAS (TEMP, HUMEDAD, PRESION) |
+|                   CREA UN SISTEMA DIFUSO                  |
 +===========================================================+
 '''
 
-def create_linguisticVariable(terms: list[tuple[str, list[int]]], var_concept: str) -> tuple[sf.LinguisticVariable, list[str]]:
+def create_fuzzySystem():
+    return sf.FuzzySystem()
+
+
+'''
++===========================================================+
+| VARIABLES LINGUISTICAS Y PRESETS (TEMP, HUMEDAD, PRESION) |
++===========================================================+
+'''
+
+def create_linguisticVariable(terms: list[tuple[str, list]]) -> tuple[sf.LinguisticVariable, list[str]]:
     S = []
     T = []
-
-    for t in terms:
-        S.append(sf.FuzzySet( function=sf.Trapezoidal_MF(t[1][0], t[1][1], t[1][2], t[1][3]), term=t[0]))
-        T.append(t[0])
 
     low_bound = terms[0][1][0]
     upp_bound = terms[-1][1][-1]
 
-    return (sf.LinguisticVariable( S, concept=var_concept, universe_of_discourse=[low_bound, upp_bound]), T)
+    for t in terms:
+        if low_bound > t[1][0]:
+            low_bound = t[1][0]
+        if upp_bound < t[1][-1]:
+            upp_bound = t[1][-1]
+        
+        S.append(sf.FuzzySet( function=sf.Trapezoidal_MF(t[1][0], t[1][1], t[1][2], t[1][3]), term=t[0]))
+        T.append(t[0])
+
+
+    return (sf.LinguisticVariable(S), T)
 
 
 # Obtener variable linguistica de temperatura dando sus limites superior, inferior y mediano (calor, frio, templado).

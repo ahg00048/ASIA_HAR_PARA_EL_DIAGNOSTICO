@@ -5,50 +5,110 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from PyQt6 import uic
 from ui.config import RESOURCES_DIR
-from core.alternative import (
+from core.ahp.alternative import (
     Alternative, relateAlternatives, alterAlternativesWeight,
     unrelateAlternatives
 )
+import math
+
+from core.fuzzy.fuzzyCriteria import *
 
 
 class AlternativesTable(QWidget):
     """
     Widget que contiene, para cada criterio, una tabla de comparación por pares
-    de las alternativas. Permite añadir/eliminar alternativas y renombrarlas.
+    de las alternativas. Permite renombrar alternativas y editar sus pesos.
+    NO permite añadir ni eliminar alternativas.
     """
 
     def __init__(self, callback_backButton, callback_nextButton, model):
         super().__init__()
         uic.loadUi(RESOURCES_DIR / "alternativesTable.ui", self)
 
-        self._model = model          # instancia de Crit_Alt
+        self._model = model
         self._updating = False
-        self._tables = []           # lista de QTableWidget
+        self._tables = []
 
-        # Construir las tablas iniciales
-        self._build_tables()
-
-        # Conectar botones de la interfaz
-        self.addAlternativeButton.clicked.connect(self.add_alternative)
-        self.removeAlternativeButton.clicked.connect(self.remove_alternative)
+        # Conectar botones de navegación
         self.saveButton.clicked.connect(self.alternatives_save_current_config)
         self.backButton.clicked.connect(callback_backButton)
         self.nextButton.clicked.connect(callback_nextButton)
 
+    def build_relations(self):
+        dfs = self._model.getDataframes()
+        if dfs is None:
+            return
+
+        alternativesParams = self._model.getAlternativesParams()
+        alternatives = self._model.getAlternatives()
+        criteria = self._model.getCriteria()
+        criteriaParams = self._model.getCriteriaParams()
+        fuzzyCriteria = {}
+
+        for crit in criteria:
+            crit_alt_p = []
+            for alt_p in alternativesParams:
+                if alt_p.crit == crit.name:
+                    crit_alt_p.append(alt_p)
+            fuzzyCriteria[crit.name] = FuzzyCriteria(crit.name, crit_alt_p)
+        
+        saaty_values = []
+        for i in range(1, 10):
+            saaty_values.append(i)
+            if i != 1:
+                saaty_values.append(1 / i)
+
+        for crit in criteria:
+            for crit_p in criteriaParams:
+                if crit_p.crit == crit.name:
+                    crit_value = crit_p.useMethod(dfs)
+                
+            if crit_value is None:
+                continue
+
+            for alt in alternatives:
+                alt_value = fuzzyCriteria[crit.name].getMembershipValue(alt.name, crit_value)
+
+                # Iteramos por las relaciones de la alt actual (siempre que sean del criterio actual)
+                alt_rels = alt.getAlternativeRels()
+                for alt_rel in alt_rels:
+                    if alt_rel.crit != crit or alt_rel.alt == alt:
+                        continue
+                    alt_o_value = fuzzyCriteria[crit.name].getMembershipValue(alt_rel.alt.name, crit_value)
+
+                    if alt_o_value == 0 and alt_value == 0:
+                        weight = 1.0
+                    elif alt_o_value == 0:
+                        weight = 9.0
+                    elif alt_value == 0:
+                        weight = 1/9
+                    else:
+                        weight = alt_value / alt_o_value
+
+                    trueWeight = 1.0
+                    min_dist = float('inf')
+                    for val in saaty_values:
+                        dist = abs(weight - val)
+                        if dist < min_dist:
+                            min_dist = dist
+                            trueWeight = val
+
+                    alterAlternativesWeight(crit, alt, alt_rel.alt, trueWeight)                    
+
+
     # ----------------------------------------------------------------------
     # Construcción de la interfaz a partir del modelo
     # ----------------------------------------------------------------------
-    def _build_tables(self):
+    def build_tables(self):
         """Crea un QGroupBox por cada criterio con su tabla correspondiente."""
         layout = self.criteriaContainer.layout()
-        # Limpiar layout previo
         while layout.count():
             child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
         self._tables = []
 
-        criteria = list(self._model.getCriteria())
+        criteria = self._model.getCriteria()
         for crit in criteria:
             group = QGroupBox(f"Criterio: {crit.name}")
             vbox = QVBoxLayout()
@@ -58,7 +118,6 @@ class AlternativesTable(QWidget):
             layout.addWidget(group)
             self._tables.append(table)
 
-        # Conectar señales después de crear todas las tablas
         for table in self._tables:
             table.cellChanged.connect(self._on_cell_changed)
             table.horizontalHeader().sectionDoubleClicked.connect(
@@ -77,7 +136,6 @@ class AlternativesTable(QWidget):
         table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         table.criterion = crit
 
-        # Cabeceras
         for i, alt in enumerate(alternatives):
             table.setHorizontalHeaderItem(i, QTableWidgetItem(alt.name))
             table.setVerticalHeaderItem(i, QTableWidgetItem(alt.name))
@@ -90,7 +148,6 @@ class AlternativesTable(QWidget):
                     relateAlternatives(crit, alt_i, alt_j, 1.0)
                     weight = 1.0
                 item = QTableWidgetItem(self._format_ahp_weight(weight))
-                # Bloquear edición en la diagonal
                 if i == j:
                     item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 table.setItem(i, j, item)
@@ -101,13 +158,10 @@ class AlternativesTable(QWidget):
         return table
 
     def _rebuild_tables(self):
-        """Reconstruye todas las tablas desde el modelo."""
-        self._build_tables()
+        self.build_tables()
 
     @staticmethod
     def _format_ahp_weight(weight):
-        """Formatea un peso numérico a su representación textual AHP."""
-        # Corregido: comparar con int(weight), no float(weight)
         if weight == int(weight):
             return str(int(weight))
         n_val = round(1.0 / weight) if weight != 0 else 1
@@ -116,48 +170,8 @@ class AlternativesTable(QWidget):
         return f"{weight:.3g}"
 
     # ----------------------------------------------------------------------
-    # Operaciones de modificación
+    # Edición de nombres y pesos (sin añadir/eliminar alternativas)
     # ----------------------------------------------------------------------
-    def add_alternative(self):
-        """Añade una nueva alternativa al modelo y a la interfaz."""
-        alternatives = list(self._model.getAlternatives())
-        n = len(alternatives)
-        new_alt = Alternative(f"Alternativa {n + 1}")
-
-        criteria = list(self._model.getCriteria())
-
-        # Relaciones consigo misma y con las existentes
-        for crit in criteria:
-            new_alt.addAlternativeRel_Self(crit)
-            for alt in alternatives:
-                relateAlternatives(crit, new_alt, alt, 1.0)
-
-        alternatives.append(new_alt)
-        self._model.updateAlternatives(alternatives)  # persistir
-
-        # Reconstruir toda la interfaz
-        self._rebuild_tables()
-
-    def remove_alternative(self):
-        """Elimina la última alternativa (mínimo 2)."""
-        alternatives = list(self._model.getAlternatives())
-        if len(alternatives) <= 2:
-            return
-
-        alt_to_remove = alternatives[-1]
-        criteria = list(self._model.getCriteria())
-
-        # Eliminar todas las relaciones que impliquen a esta alternativa
-        for crit in criteria:
-            for alt in alternatives:
-                if alt != alt_to_remove:
-                    unrelateAlternatives(crit, alt_to_remove, alt)
-
-        alternatives.remove(alt_to_remove)
-        self._model.updateAlternatives(alternatives)
-
-        self._rebuild_tables()
-
     def _edit_alternative_name(self, index):
         """Renombra una alternativa en el modelo y en las cabeceras."""
         alternatives = list(self._model.getAlternatives())
@@ -188,7 +202,6 @@ class AlternativesTable(QWidget):
         if self._updating:
             return
 
-        # Seguridad extra para la diagonal (aunque no debería ser editable)
         if row == col:
             table = self.sender()
             if isinstance(table, QTableWidget):
@@ -221,10 +234,8 @@ class AlternativesTable(QWidget):
         alt_row = alternatives[row]
         alt_col = alternatives[col]
 
-        # Actualizar el modelo (esto fija ambas direcciones)
         alterAlternativesWeight(crit, alt_row, alt_col, val)
 
-        # Refrescar las dos celdas desde el modelo para garantizar consistencia
         self._updating = True
         new_weight_row_col = alt_row.getAltWeight_Crit_Alt(crit, alt_col)
         new_weight_col_row = alt_col.getAltWeight_Crit_Alt(crit, alt_row)

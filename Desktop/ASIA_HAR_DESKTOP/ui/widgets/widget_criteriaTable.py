@@ -3,7 +3,7 @@ from PyQt6.QtCore import Qt, QEvent
 from PyQt6 import uic
 
 from ui.config import RESOURCES_DIR
-from core.criteria import Criteria, relateCriterias, alterCriteriasWeight, unrelateCriterias
+from core.ahp.criteria import Criteria, relateCriterias, alterCriteriasWeight, unrelateCriterias
 
 
 class CriteriaTable(QWidget):

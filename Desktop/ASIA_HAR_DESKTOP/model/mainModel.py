@@ -1,8 +1,7 @@
 import asyncio
 
-from core import ahp_analysis, criteria, alternative, criteria_data_params
-import core.dataframe_utils as dtf_utils
-import core.dataManager as dm
+import core.dataManagement.dataframe_utils as dtf_utils
+import core.dataManagement.dataManager as dm
 
 class mainModel():
     def __init__(self):

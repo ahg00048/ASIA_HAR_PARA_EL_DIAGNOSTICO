@@ -1,7 +1,7 @@
-from core.alternative import *
-from core.criteria import *
-from core.criteria_data_params import *
-from core.alternatives_data_params import *
+from core.ahp.alternative import *
+from core.ahp.criteria import *
+from core.ahp.criteria_data_params import *
+from core.ahp.alternatives_data_params import *
 from core.config import DATA
 import json
 

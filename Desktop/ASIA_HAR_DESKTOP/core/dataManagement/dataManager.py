@@ -1,9 +1,7 @@
 from core.config import * 
-from core.serializer_utils import *
+from core.dataManagement.serializer_utils import *
 import os
 import pandas as pd
-import requests
-import asyncio
 import aiohttp
 import aiofiles
 from zipfile import ZipFile

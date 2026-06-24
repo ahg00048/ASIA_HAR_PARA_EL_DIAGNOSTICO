@@ -4,7 +4,6 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton
 import asyncio
 from qasync import QEventLoop, QApplication
 
-from ui.widgets import widget_alternativesTable, widget_criteriaTable
 from ui.main_window import Main_window
 
 

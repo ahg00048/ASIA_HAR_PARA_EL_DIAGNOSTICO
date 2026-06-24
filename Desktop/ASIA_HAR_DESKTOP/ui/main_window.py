@@ -4,7 +4,7 @@ from model.mainModel import mainModel
 from PyQt6 import uic
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QStackedWidget
-from .widgets import widget_alternativesTable, widget_criteriaAssigment, widget_criteriaTable, widget_timeRange, widget_alternativesAssigment
+from .widgets import widget_alternativesTable, widget_chosenAlternative, widget_criteriaAssigment, widget_criteriaTable, widget_timeRange, widget_alternativesAssigment
 
 class Main_window(QMainWindow):
     def __init__(self):
@@ -14,24 +14,22 @@ class Main_window(QMainWindow):
 
         self._model = mainModel()
         
-        self._timeRange = widget_timeRange.TimeRange(self.go_to_template, self.go_to_criteriaTable, self._model)
+        self._timeRange = widget_timeRange.TimeRange(self.go_to_criteriaTable, self._model)
         self._criteriaTable = widget_criteriaTable.CriteriaTable(self.go_to_timeRange, self.go_to_criteriaAssigment, self._model)
         self._criteriaAssigment = widget_criteriaAssigment.CriteriaAssigment(self.go_to_criteriaTable, self.go_to_alternativesAssigment, self._model)
         self._alternativesAssigment = widget_alternativesAssigment.AlternativesAssigment(self.go_to_criteriaAssigment, self.go_to_alternativesTable, self._model)
-        self._alternativesTable = widget_alternativesTable.AlternativesTable(self.go_to_alternativesAssigment, self.go_to_alternativesTable, self._model)
+        self._alternativesTable = widget_alternativesTable.AlternativesTable(self.go_to_alternativesAssigment, self.go_to_chosenAlternative, self._model)
+        self._chosenAlternative = widget_chosenAlternative.ChosenAlernative(self.go_to_alternativesTable, self.go_to_timeRange, self._model)
         
         self.stackedWidget.addWidget(self._timeRange)
         self.stackedWidget.addWidget(self._criteriaTable)
         self.stackedWidget.addWidget(self._criteriaAssigment)
         self.stackedWidget.addWidget(self._alternativesAssigment)
         self.stackedWidget.addWidget(self._alternativesTable)
+        self.stackedWidget.addWidget(self._chosenAlternative)
 
         # Vista inicial
         self.go_to_timeRange()
-
-
-    def go_to_template(self):
-        pass
 
 
     def go_to_timeRange(self):
@@ -54,5 +52,10 @@ class Main_window(QMainWindow):
 
 
     def go_to_alternativesTable(self):
-        self.stackedWidget.setCurrentIndex(4)        
+        self.stackedWidget.setCurrentIndex(4)      
+        self.stackedWidget.currentWidget().build_relations()
+        self.stackedWidget.currentWidget().build_tables()  
 
+    def go_to_chosenAlternative(self):
+        self.stackedWidget.setCurrentIndex(5)
+        self.stackedWidget.currentWidget().compute_and_display()

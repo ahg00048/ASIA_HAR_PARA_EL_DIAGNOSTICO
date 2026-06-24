@@ -130,3 +130,10 @@ def dataFrames_list(df: pd.DataFrame, property: str) -> list:
 
 def dataFrames_properties(df: pd.DataFrame) -> list[str]:
     return df.columns
+
+
+def dataFrames_check_property_exist(df: pd.DataFrame, name: str) -> bool:
+    return (name in df)
+
+def dataFrames_check_empty(df: pd.DataFrame):
+    return df.empty

@@ -1,4 +1,4 @@
-from .criteria import *
+from core.ahp.criteria import *
 
 class Alternative_rel:
     weight = 1

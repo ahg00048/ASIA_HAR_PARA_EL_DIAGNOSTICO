@@ -3,8 +3,8 @@ from PyQt6.QtWidgets import QWidget, QGroupBox, QVBoxLayout, QLabel, QComboBox, 
 from PyQt6.QtCore import Qt
 
 from ui.config import RESOURCES_DIR
-from core.criteria_data_params import CriteriaDataParams
-from core.criteria import Criteria, relateCriterias, alterCriteriasWeight, unrelateCriterias
+from core.ahp.criteria_data_params import CriteriaDataParams
+from core.ahp.criteria import Criteria, relateCriterias, alterCriteriasWeight, unrelateCriterias
 
 class CriteriaAssigment(QWidget):
     def __init__(self, callback_backButton, callback_nextButton, model):

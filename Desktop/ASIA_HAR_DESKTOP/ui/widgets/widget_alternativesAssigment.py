@@ -6,8 +6,8 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from ui.config import RESOURCES_DIR
 
-from core.alternative import *
-from core.alternatives_data_params import *
+from core.ahp.alternative import *
+from core.ahp.alternatives_data_params import *
 
 
 class AlternativesAssigment(QWidget):
@@ -107,7 +107,7 @@ class AlternativesAssigment(QWidget):
 
                 for i, punto in enumerate(points):
                     sb = QDoubleSpinBox()
-                    sb.setRange(0.0, 100.0)
+                    sb.setRange(0.0, 100000.0)
                     sb.setValue(punto)
                     sb.setSingleStep(0.5)
                     sb.setDecimals(1)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Widget_TimeRangeWidget</class>
- <widget class="QWidget" name="Widget_TimeRangeWidget">
+ <class>TimeRange</class>
+ <widget class="QWidget" name="TimeRange">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -56,12 +56,6 @@
     }
     QPushButton:pressed {
         background-color: #00796B;
-    }
-    QPushButton#backButton {
-        background-color: #80CBC4;
-    }
-    QPushButton#backButton:hover {
-        background-color: #4DB6AC;
     }
     QPushButton#nextButton {
         background-color: #009688;
@@ -174,13 +168,6 @@
      <property name="spacing">
       <number>12</number>
      </property>
-     <item>
-      <widget class="QPushButton" name="backButton">
-       <property name="text">
-        <string>← Volver</string>
-       </property>
-      </widget>
-     </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">

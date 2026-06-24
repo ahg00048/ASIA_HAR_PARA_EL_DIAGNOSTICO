@@ -1,5 +1,5 @@
-from core.alternative import *
-from core.criteria import *
+from core.ahp.alternative import *
+from core.ahp.criteria import *
 
 RANDOM_INDEX = [0, 0, 0.58, 0.89, 1.11, 1.24, 1.32, 1.4, 1.45, 1.49]
 VALID_UPPER_BOUND_CONSISTENCY_RELATION = 0.10
