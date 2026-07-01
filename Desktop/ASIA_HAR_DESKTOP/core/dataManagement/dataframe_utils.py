@@ -36,6 +36,7 @@ def dataFrames_min_max(df: pd.DataFrame, property: str) -> tuple:
 
 def dataFrames_max(df: pd.DataFrame, property: str) -> float:
     max = float('-inf')
+    min = float('inf')
 
     try:
         for (idx, row) in df.iterrows():
@@ -49,10 +50,12 @@ def dataFrames_max(df: pd.DataFrame, property: str) -> float:
                 
             if value > max:
                 max = value
+            if value < min:
+                min = value
     except KeyError:
         return None
 
-    return max
+    return max if property != 'steps' else max - min
 
 
 def dataFrames_min(df: pd.DataFrame, property: str) -> float:
@@ -98,7 +101,7 @@ def dataFrames_sum(df: pd.DataFrame, property: str) -> float:
 
 def dataFrames_mean(df: pd.DataFrame, property: str) -> float:
     sum = 0.0
-    
+
     try:
         for (idx, row) in df.iterrows():
             value = row.loc[property]
@@ -135,5 +138,31 @@ def dataFrames_properties(df: pd.DataFrame) -> list[str]:
 def dataFrames_check_property_exist(df: pd.DataFrame, name: str) -> bool:
     return (name in df)
 
+
 def dataFrames_check_empty(df: pd.DataFrame):
     return df.empty
+
+
+def dataFrames_split(df: pd.DataFrame, time_interval_in_seconds: int) -> list[pd.DataFrame]:
+    if df.empty or 'timestamp' not in df:
+        return []
+
+    df = df.copy()
+
+    splited = []
+    start_idx = 0
+    start_time = df.loc[0, 'timestamp']
+
+    for i in range(1, len(df)):
+        if df.loc[i, 'timestamp'] - start_time > time_interval_in_seconds:
+            splited.append(df.iloc[start_idx:i].reset_index(drop=True))
+            start_idx = i
+            start_time = df.loc[i, 'timestamp']
+
+    splited.append(df.iloc[start_idx:].reset_index(drop=True))
+
+    return splited
+
+
+def dataFrames_empty():
+    return pd.DataFrame()

@@ -78,11 +78,13 @@ DATA = {
             'CRIT_PARAM_DATA_METHOD': 'method',
             'ALT_SET_NAME': 'alternatives',
             'ALT_DATA_REL_ALT': 'alt',
+            'ALT_DATA_REL_DF': 'df_id',
             'ALT_DATA_REL': 'alternatives_relations',
             'ALT_PARAM_SET_NAME': 'alternatives_data_params',
             'ALT_PARAM_DATA_FUNC': 'trap_func',
             'TIME_START': 'time_start',
             'TIME_RANGE': 'time_range',
+            'TIME_INTERVAL' : 'time_interval',
             'DFS_EXCLUDE': 'dfs_exclude_properties'
         }
     }

@@ -54,7 +54,8 @@ class Main_window(QMainWindow):
     def go_to_alternativesTable(self):
         self.stackedWidget.setCurrentIndex(4)      
         self.stackedWidget.currentWidget().build_relations()
-        self.stackedWidget.currentWidget().build_tables()  
+        self.stackedWidget.currentWidget().init_intervals()  
+
 
     def go_to_chosenAlternative(self):
         self.stackedWidget.setCurrentIndex(5)

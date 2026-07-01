@@ -103,6 +103,7 @@ _alt_param_set_name = _data_persistence['ALT_PARAM_SET_NAME']
 _alt_param_func = _data_persistence['ALT_PARAM_DATA_FUNC']
 
 _alt_rel_alt = _data_persistence['ALT_DATA_REL_ALT']
+_alt_rel_df_id = _data_persistence['ALT_DATA_REL_DF']
 _alt_rel = _data_persistence['ALT_DATA_REL']
 
 # time range
@@ -208,9 +209,6 @@ def get_all_alt(criteria: list[Criteria], backup = False):
         curr_alt = alternatives[i]
         curr_alt_rel = alternatives_aux[i][1]
 
-        for crit in criteria:
-            curr_alt.addAlternativeRel_Self(crit)
-
         curr_crit = None
         for rel in curr_alt_rel:
             for crit in criteria:
@@ -218,8 +216,8 @@ def get_all_alt(criteria: list[Criteria], backup = False):
                     curr_crit = crit
 
             for j in range(len(alternatives)):
-                if rel[_alt_rel_alt] == alternatives[j].name and not curr_alt.hasAlternativeInRels(curr_crit, alternatives[j]):
-                    relateAlternatives(curr_crit, curr_alt, alternatives[j], rel[_all_weight])
+                if rel[_alt_rel_alt] == alternatives[j].name and not curr_alt.hasAlternativeInRels(curr_crit, alternatives[j], rel[_alt_rel_df_id] if _alt_rel_df_id in rel else 0):
+                    relateAlternatives(curr_crit, curr_alt, alternatives[j], rel[_alt_rel_df_id] if _alt_rel_df_id in rel else 0, rel[_all_weight])
                     break
 
     return alternatives
@@ -288,8 +286,8 @@ def get_time(backup = False):
     return time_tuple
 
 
-def save_time(time_start, time_range, backup = False):
-    file_content = time_to_json(time_start, time_range)
+def save_time(time_start, time_range, time_interval, backup = False):
+    file_content = time_to_json(time_start, time_range, time_interval)
 
     data_path = (_time_data if not backup else _time_data_bu)
     

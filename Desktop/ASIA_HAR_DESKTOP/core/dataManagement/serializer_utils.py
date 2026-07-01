@@ -25,11 +25,12 @@ _alt_param_func = _data_persistence['ALT_PARAM_DATA_FUNC']
 _alt_set_name = _data_persistence['ALT_SET_NAME']
 _alt_rel_alt = _data_persistence['ALT_DATA_REL_ALT']
 _alt_rel = _data_persistence['ALT_DATA_REL']
+_alt_rel_df_id = _data_persistence['ALT_DATA_REL_DF']
 
 # time range
 _time_start = _data_persistence['TIME_START']
 _time_range = _data_persistence['TIME_RANGE']
-
+_time_interval = _data_persistence['TIME_INTERVAL']
 
 '''
 ===============================================================
@@ -56,7 +57,8 @@ def alt_to_json(alt: Alternative) -> str:
         dict[alt_rel].append({
             _all_rel_crit : rel.crit.name,
             _alt_rel_alt : rel.alt.name,
-            _all_weight : rel.weight
+            _all_weight : rel.weight,
+            _alt_rel_df_id : rel.df_id
         })
 
     return json.dumps(dict)
@@ -84,7 +86,8 @@ def alt_list_to_json(alts: list[Alternative]):
             dict[_alt_rel].append({
                 _all_rel_crit : rel.crit.name,
                 _alt_rel_alt : rel.alt.name,
-                _all_weight : rel.weight
+                _all_weight : rel.weight,
+                _alt_rel_df_id : rel.df_id
             })
 
         alt_list.append(dict.copy())
@@ -293,10 +296,11 @@ def crit_param_list_from_json(crit_param_json) -> list[CriteriaDataParams]:
 '''
 Function that converts time range into json
 '''
-def time_to_json(time_start: int, time_range: int):
+def time_to_json(time_start: int, time_range: int, time_interval):
     time_dict = {
         _time_start : time_start,
-        _time_range : time_range
+        _time_range : time_range,
+        _time_interval : time_interval
     }
 
     return json.dumps(time_dict)
@@ -308,10 +312,10 @@ Function that converts json into time range
 def time_from_json(time_json: str) -> tuple[int, int]:
     time_dict = json.loads(time_json)
 
-    if _time_start not in time_dict or _time_range not in time_dict:
-        return (0, 0)
+    if _time_start not in time_dict or _time_range not in time_dict or _time_interval not in time_dict:
+        return (0, 0, 0)
 
-    return (int(time_dict[_time_start]), int(time_dict[_time_range]))
+    return (int(time_dict[_time_start]), int(time_dict[_time_range]), int(time_dict[_time_interval]))
 
 
 '''

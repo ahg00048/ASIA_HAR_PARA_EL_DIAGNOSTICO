@@ -7,7 +7,7 @@ class CriteriaDataParams:
         self.method = method
     
     def useMethod(self, dfs):
-        for df in dfs.values():
+        for df in dfs:
             if not dfs_utils.dataFrames_check_property_exist(df, self.param) or dfs_utils.dataFrames_check_empty(df): 
                 continue
             match self.method:

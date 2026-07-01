@@ -14,11 +14,13 @@ class mainModel():
 
         self._timeStart = time_tuple[0]
         self._timeRange = time_tuple[1]
+        self._timeInterval = time_tuple[2]
         
         self._dataFrames = None
         self._task_dfs = None
         self._loadingDFs = False
         self._unableToConnectToServer = False
+        self._dataFrames_intervalList = [[]]
 
 # Alts and Crit
 
@@ -64,15 +66,16 @@ class mainModel():
 
 # Time
 
-    def setTime(self, start, end):
+    def setTime(self, start, end, interval):
         self._timeStart = start
         self._timeRange = end - start
+        self._timeInterval = interval
 
     def getTime(self):
-        return (self._timeStart, self._timeRange)
+        return (self._timeStart, self._timeRange, self._timeInterval)
 
     def saveTime(self):
-        dm.save_time(self._timeStart, self._timeRange)
+        dm.save_time(self._timeStart, self._timeRange, self._timeInterval)
 
 # Dataframes
     
@@ -123,3 +126,20 @@ class mainModel():
 
     def getDfsMethods(self):
         return ["Media", "Max", "Min", "Suma"]
+    
+    def getDataframes_intervalList(self):
+        if self._dataFrames is not None:
+            max = 0
+            data_list = []
+            for df in self._dataFrames.values():
+                dataFrame_interval = dtf_utils.dataFrames_split(df, self._timeInterval * 60)
+                if max < len(dataFrame_interval):
+                    max = len(dataFrame_interval)
+                data_list.append(dataFrame_interval)
+
+            self._dataFrames_intervalList = [[] for _ in range(max)]
+            for i in range(max):
+                for df_interval in data_list:
+                    self._dataFrames_intervalList[i].append(df_interval[i] if i < len(df_interval) else dtf_utils.dataFrames_empty())
+
+        return self._dataFrames_intervalList
