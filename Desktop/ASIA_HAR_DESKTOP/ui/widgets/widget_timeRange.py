@@ -40,11 +40,11 @@ class TimeRange(QWidget):
         if diff_minutes < 30:
             self.errorLabel.setText("El intervalo mínimo es de 30 minutos.")
             return
-        if diff_minutes > 1440:  
-            self.errorLabel.setText("El intervalo máximo es de 24 horas.")
+        if diff_minutes > 10080:  
+            self.errorLabel.setText("El intervalo máximo es de 7 días.")
             return
-        if interval < 1 or interval > 240:
-            self.errorLabel.setText("El intervalo debe estar entre 1 y 240 minutos.")
+        if interval < 1 or interval > 1440:
+            self.errorLabel.setText("El intervalo debe estar entre 1 minuto y un día.")
             return
 
         start_ts = start.timestamp()
