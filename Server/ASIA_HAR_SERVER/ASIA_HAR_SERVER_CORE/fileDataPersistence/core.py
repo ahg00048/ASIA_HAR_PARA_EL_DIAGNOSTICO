@@ -125,12 +125,13 @@ def makeZipFromDataFrames(data_frames, path, subdir_format, house_id):
 
 # Public =================================================================0
 
-def retrieveData_Test(house_id: int, time_start_in_seconds, time_range_in_seconds):
+def retrieveData_Test(house_id: int, version: int, time_start_in_seconds, time_range_in_seconds):
     dataRootDir = DATASETS_TEST['DIR']
-    dataSubDirs = DATASETS_TEST['SUBDIRS_FORMAT'] 
+    dataSubDirs = DATASETS_TEST['SUBDIRS_FORMAT']
+    dataSubdirsVersion = DATASETS_TEST['V1' if version == 1 else 'V2'] 
     dataFilesFormat = DATASETS_TEST['FILES_FORMAT'] # list
 
-    path_format = "%s/%s{0}/{1}{0}.{2}" % (dataRootDir, dataSubDirs) 
+    path_format = "%s/%s/%s{0}/{1}{0}.{2}" % (dataRootDir, dataSubdirsVersion, dataSubDirs) 
     validPaths = []
 
     for dataFileFormat in dataFilesFormat:
@@ -138,17 +139,19 @@ def retrieveData_Test(house_id: int, time_start_in_seconds, time_range_in_second
         if os.path.exists(filePath):
             validPaths.append(filePath)
 
-    if validPaths.count == 0:
+    if len(validPaths) == 0:
         raise FileExistsError()
     
-    if not isDataCompressed(house_id, dataRootDir, dataSubDirs):
-        compressFiles(validPaths, house_id, dataRootDir, dataSubDirs)
+    dataRootDir_v = "%s/%s" % (dataRootDir, dataSubdirsVersion)
 
-    dataPath = getCompressedDataPath(house_id, dataRootDir, dataSubDirs)
+    if not isDataCompressed(house_id, dataRootDir_v, dataSubDirs):
+        compressFiles(validPaths, house_id, dataRootDir_v, dataSubDirs)
+
+    dataPath = getCompressedDataPath(house_id, dataRootDir_v, dataSubDirs)
     dfs = retrieveDataFrames(dataPath)
     dfs = cullDataFromTimeRange(dfs, time_start_in_seconds, time_range_in_seconds)
 
-    path_format = "%s/%s{0}/%s/" % (dataRootDir, dataSubDirs, TEMP_DIR)
+    path_format = "%s/%s/%s{0}/%s/" % (dataRootDir, dataSubdirsVersion, dataSubDirs, TEMP_DIR)
     resultPath = makeZipFromDataFrames(dfs, path_format.format(house_id), dataSubDirs, house_id)
-
+    print(resultPath)
     return resultPath

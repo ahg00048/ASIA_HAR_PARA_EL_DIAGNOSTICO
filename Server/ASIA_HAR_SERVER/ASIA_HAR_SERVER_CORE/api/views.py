@@ -10,25 +10,26 @@ from django.http import StreamingHttpResponse
 from wsgiref.util import FileWrapper
 
 # models and serializers
-from ASIA_HAR_SERVER_CORE.models import User
-from ASIA_HAR_SERVER_CORE.models import Patient
-from ASIA_HAR_SERVER_CORE.api.serializer import UserSerializer
-from ASIA_HAR_SERVER_CORE.api.serializer import PatientSerializer
+# from ASIA_HAR_SERVER_CORE.models import User
+# from ASIA_HAR_SERVER_CORE.models import Patient
+# from ASIA_HAR_SERVER_CORE.api.serializer import UserSerializer
+# from ASIA_HAR_SERVER_CORE.api.serializer import PatientSerializer
+
 
 # extra
-from ASIA_HAR_SERVER_CORE.fileDataPersistence.core import *  
+from ..fileDataPersistence.core import retrieveData_Test
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    permission_classes = [permissions.IsAdminUser]
-    serializer_class = UserSerializer
+# class UserViewSet(viewsets.ModelViewSet):
+#     queryset = User.objects.all()
+#     permission_classes = [permissions.IsAdminUser]
+#     serializer_class = UserSerializer
 
     
-class PatientViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    permission_classes = [permissions.IsAdminUser]
-    serializer_class = PatientSerializer
+# class PatientViewSet(viewsets.ModelViewSet):
+#     queryset = User.objects.all()
+#     permission_classes = [permissions.IsAdminUser]
+#     serializer_class = PatientSerializer
 
 '''
 ======================================================================
@@ -38,175 +39,180 @@ class PatientViewSet(viewsets.ModelViewSet):
 
 # =========================== Users ===========================
 
-def deleteUser(request, userId): # Body -> current user | query param -> email of user to del
-    try:
-        user = User.objects.get(id=userId)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+# def deleteUser(request, userId): # Body -> current user | query param -> email of user to del
+#     try:
+#         user = User.objects.get(id=userId)
+#     except User.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if (not user.admin and user.email != request.query_params.get('email_to_del')):
-        return Response(status=status.HTTP_403_FORBIDDEN)
+#     if (not user.admin and user.email != request.query_params.get('email_to_del')):
+#         return Response(status=status.HTTP_403_FORBIDDEN)
     
-    try:
-        userToDel = User.objects.get(email=request.query_params.get('email_to_del'))
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+#     try:
+#         userToDel = User.objects.get(email=request.query_params.get('email_to_del'))
+#     except User.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    patients = Patient.objects.filter(users_assigned__id=userToDel.id)
-    for p in patients:
-        p.users_assigned.remove(userToDel)
+#     patients = Patient.objects.filter(users_assigned__id=userToDel.id)
+#     for p in patients:
+#         p.users_assigned.remove(userToDel)
 
-    userToDel.delete()
+#     userToDel.delete()
     
-    try:
-        user = User.objects.get(id=userId)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_200_OK)
+#     try:
+#         user = User.objects.get(id=userId)
+#     except User.DoesNotExist:
+#         return Response(status=status.HTTP_200_OK)
 
-    serializer = UserSerializer(user)
+#     serializer = UserSerializer(user)
 
-    return Response(serializer.data, status=status.HTTP_200_OK)
+#     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-def addUser(request): # Body -> current user 
-    # check if user is created properly (password checks etc)
+# def addUser(request): # Body -> current user 
+#     # check if user is created properly (password checks etc)
 
-    #
-    if User.objects.filter(email=request.data.get('email')).count() != 0:
-        return Response(status=status.HTTP_409_CONFLICT) 
+#     #
+#     if User.objects.filter(email=request.data.get('email')).count() != 0:
+#         return Response(status=status.HTTP_409_CONFLICT) 
 
-    serializer = UserSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+#     serializer = UserSerializer(data=request.data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-def modifyUser(request, userId): # Body -> current user 
-    try:
-        user = User.objects.get(id=userId)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+# def modifyUser(request, userId): # Body -> current user 
+#     try:
+#         user = User.objects.get(id=userId)
+#     except User.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    serializer = UserSerializer(user, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+#     serializer = UserSerializer(user, data=request.data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
     
-    return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+#     return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
-def login(request): # query param -> email and password
-    try:
-        user = User.objects.get(email=request.query_params.get('email'))
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    password = request.query_params.get('password')
+# def login(request): # query param -> email and password
+#     try:
+#         user = User.objects.get(email=request.query_params.get('email'))
+#     except User.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+#     password = request.query_params.get('password')
     
-    if not check_password(password, user.password):
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+#     if not check_password(password, user.password):
+#         return Response(status=status.HTTP_401_UNAUTHORIZED)
     
-    serializer = UserSerializer(user)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+#     serializer = UserSerializer(user)
+#     return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 # =========================== Patients ===========================
 
-def addPatient(request, userId):
-    try:
-        user = User.objects.get(id=userId)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+# def addPatient(request, userId):
+#     try:
+#         user = User.objects.get(id=userId)
+#     except User.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
         
-    try:
-        patient = Patient.objects.get(card_id=request.data.get('card_id'))
-    except Patient.DoesNotExist:
-        serializer = PatientSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            # add user assign
-            patient = Patient.objects.get(card_id=request.data.get('card_id'))
-            patient.users_assigned.add(user)
-            #
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     try:
+#         patient = Patient.objects.get(card_id=request.data.get('card_id'))
+#     except Patient.DoesNotExist:
+#         serializer = PatientSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             # add user assign
+#             patient = Patient.objects.get(card_id=request.data.get('card_id'))
+#             patient.users_assigned.add(user)
+#             #
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    patient.users_assigned.add(user)
-    patient.save()
+#     patient.users_assigned.add(user)
+#     patient.save()
 
-    return Response(status=status.HTTP_202_ACCEPTED)
+#     return Response(status=status.HTTP_202_ACCEPTED)
 
 
-def getPatients(request, userId):
-    try:
-        user = User.objects.get(id=userId)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+# def getPatients(request, userId):
+#     try:
+#         user = User.objects.get(id=userId)
+#     except User.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
         
-    patients = Patient.objects.filter(users_assigned__id=userId)
-    serialier = PatientSerializer(patients, many=True)
-    return Response(serialier.data, status=status.HTTP_200_OK)
+#     patients = Patient.objects.filter(users_assigned__id=userId)
+#     serialier = PatientSerializer(patients, many=True)
+#     return Response(serialier.data, status=status.HTTP_200_OK)
 
 
-def removePatient(request, userId, patientId):
-    try:
-        user = User.objects.get(id=userId)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+# def removePatient(request, userId, patientId):
+#     try:
+#         user = User.objects.get(id=userId)
+#     except User.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
         
-    try:
-        patient = Patient.objects.get(id=patientId)
-    except Patient.DoesNotExist:
-        Response(status=status.HTTP_404_NOT_FOUND)
+#     try:
+#         patient = Patient.objects.get(id=patientId)
+#     except Patient.DoesNotExist:
+#         Response(status=status.HTTP_404_NOT_FOUND)
 
-    patient.users_assigned.remove(user)
+#     patient.users_assigned.remove(user)
 
-    if patient.users_assigned.count() == 0:
-        patient.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+#     if patient.users_assigned.count() == 0:
+#         patient.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    return Response(status=status.HTTP_202_ACCEPTED)
+#     return Response(status=status.HTTP_202_ACCEPTED)
 
 
-def modifyPatient(request, userId, patientId):
-    try:
-        user = User.objects.get(id=userId)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+# def modifyPatient(request, userId, patientId):
+#     try:
+#         user = User.objects.get(id=userId)
+#     except User.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    try:
-        patient = Patient.objects.get(id=patientId)
-    except Patient.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+#     try:
+#         patient = Patient.objects.get(id=patientId)
+#     except Patient.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    serializer = PatientSerializer(patient, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+#     serializer = PatientSerializer(patient, data=request.data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
     
-    return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
+#     return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
-def getPatientData(request, userId, patientId):
-    return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+# def getPatientData(request, userId, patientId):
+#     return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
 
 # =========================== Example Patient Data ===========================
-
+import os
 def getExamplePatientData(request):
-    house_id = int(request.query_params.get('house_id'))
-    time_start_in_seconds = float(request.query_params.get('time_start_in_seconds'))
-    time_range_in_seconds = float(request.query_params.get('time_range_in_seconds'))
-    
-    if house_id is None or time_range_in_seconds is None or time_start_in_seconds is None:
+    try:
+        house_id = int(request.query_params.get('house_id'))
+        time_start_in_seconds = float(request.query_params.get('time_start_in_seconds'))
+        time_range_in_seconds = float(request.query_params.get('time_range_in_seconds'))
+        version = int(request.query_params.get('version'))
+    except BaseException:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    if house_id is None or time_range_in_seconds is None or time_start_in_seconds is None or version is None:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        dataPath = retrieveData_Test(house_id, time_start_in_seconds, time_range_in_seconds)
+        dataPath = retrieveData_Test(house_id, version, time_start_in_seconds, time_range_in_seconds)
         file = open(dataPath, 'rb')
     except BaseException:
+        print('except bitch')
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     response = StreamingHttpResponse(
@@ -227,39 +233,39 @@ def getExamplePatientData(request):
 
 # =========================== Users ===========================
 
-@api_view(['GET', 'POST'])
-def User_Get_Or_Create(request, format=None):
-    if request.method == 'GET':
-        return login(request)
-    elif request.method == 'POST':
-        return addUser(request)
+# @api_view(['GET', 'POST'])
+# def User_Get_Or_Create(request, format=None):
+#     if request.method == 'GET':
+#         return login(request)
+#     elif request.method == 'POST':
+#         return addUser(request)
 
 
-@api_view(['PUT', 'DELETE'])
-def User_Delete_Or_Modify(request, userId, format=None):
-    if request.method == 'PUT':
-        return modifyUser(request, userId)
-    elif request.method == 'DELETE':
-        return deleteUser(request, userId)
+# @api_view(['PUT', 'DELETE'])
+# def User_Delete_Or_Modify(request, userId, format=None):
+#     if request.method == 'PUT':
+#         return modifyUser(request, userId)
+#     elif request.method == 'DELETE':
+#         return deleteUser(request, userId)
 
-# =========================== Patients ===========================
+# # =========================== Patients ===========================
 
-@api_view(['GET', 'POST'])
-def Patients_Get_All_Or_Add(request, userId, format=None):
-    if request.method == 'GET':
-        return getPatients(request, userId)
-    elif request.method == 'POST':
-        return addPatient(request, userId)
+# @api_view(['GET', 'POST'])
+# def Patients_Get_All_Or_Add(request, userId, format=None):
+#     if request.method == 'GET':
+#         return getPatients(request, userId)
+#     elif request.method == 'POST':
+#         return addPatient(request, userId)
 
 
-@api_view(['GET', 'DELETE', 'PUT'])
-def Patients_Get_SensorData_Or_Delete_Or_Add_Or_Modify(request, userId, patientId, format=None):
-    if request.method == 'GET':
-        return getPatientData(request, userId, patientId)
-    elif request.method == 'DELETE':
-        return removePatient(request, userId, patientId)
-    elif request.method == 'PUT':
-        return modifyPatient(request, userId, patientId)
+# @api_view(['GET', 'DELETE', 'PUT'])
+# def Patients_Get_SensorData_Or_Delete_Or_Add_Or_Modify(request, userId, patientId, format=None):
+#     if request.method == 'GET':
+#         return getPatientData(request, userId, patientId)
+#     elif request.method == 'DELETE':
+#         return removePatient(request, userId, patientId)
+#     elif request.method == 'PUT':
+#         return modifyPatient(request, userId, patientId)
 
 # ============== BASIC / JUST TO RESUME DESKTOP DEV ==============
 

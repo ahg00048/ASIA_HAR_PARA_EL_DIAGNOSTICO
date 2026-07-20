@@ -4,11 +4,15 @@ from pathlib import Path
 
 
 if getattr(sys, 'frozen', False):
-    _BASE_DIR = Path(sys._MEIPASS)          # recursos de solo lectura
+    _BASE_DIR = Path(sys._MEIPASS)          
     _DATA_ROOT = Path.home() / "AppData" / "Roaming" / "ASIA_HAR_DESKTOP"
 else:
     _BASE_DIR = Path(__file__).resolve().parent.parent
     _DATA_ROOT = _BASE_DIR
+
+
+OUTPUT_DATA_DIR = Path.home() / "ASIA_HAR_RESULTS"
+OUTPUT_DATA_FORMAT = "output_v{0}_house_{1}_at_{2}.txt"
 
 RESOURCES_DIR = _BASE_DIR / "ui" / "resources"
 
@@ -34,11 +38,11 @@ API_HOST = {
     'PORT': '8000',
     'ROOT_URL': 'ASIA_HAR/api/',
     'URLs': [
-        'users/',
-        'users/{0}/',
-        'users/{0}/patients/',
-        'users/{0}/patients/{1}/',
-        'example/'
+        'users',
+        'users/{0}',
+        'users/{0}/patients',
+        'users/{0}/patients/{1}',
+        'example'
     ]
 }
 

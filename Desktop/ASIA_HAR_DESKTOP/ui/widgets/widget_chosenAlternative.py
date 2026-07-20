@@ -1,7 +1,7 @@
 from PyQt6 import uic
 from PyQt6.QtWidgets import (
     QWidget, QTableWidgetItem, QGroupBox, QVBoxLayout,
-    QLabel, QTableWidget
+    QLabel, QTableWidget, QHeaderView
 )
 from PyQt6.QtCore import Qt
 from ui.config import RESOURCES_DIR
@@ -52,9 +52,23 @@ class ChosenAlernative(QWidget):
                 consistency_text += "(no aceptable)"
         self.consistencyLabel.setText(consistency_text)
 
+        result_content = ""
+        result_content_str_interval = "intervalo_{0}\n\n"
+        result_content_max_tableHeader_length = 14
+
+        for alt in alternatives:
+            if len(alt.name) > result_content_max_tableHeader_length:
+                result_content_max_tableHeader_length = len(alt.name)
+
+        result_content_str_tableHeader = ('%-' + str(result_content_max_tableHeader_length) + 's   Puntuacion\n') % "Alternativa"
+        result_content_str_tableRow_fmt = ('%-' + str(result_content_max_tableHeader_length) + 's   %s')
+
         # 2. Para cada intervalo, calcular pesos locales de alternativas y resultado global
         layout = self.resultsContainer.layout()
         for df_id in range(num_intervals):
+            result_content = result_content + result_content_str_interval.format(df_id)
+            result_content = result_content + result_content_str_tableHeader
+
             # --- Pesos locales de alternativas por criterio para este df_id ---
             alt_weights_per_crit = []
             consistency_warnings = []
@@ -66,9 +80,7 @@ class ChosenAlernative(QWidget):
                 if len(alternatives) > 2:
                     cr_alt = calculate_CR(ci_alt, len(alternatives))
                     if not check_Valid_CR(cr_alt):
-                        consistency_warnings.append(
-                            f"Matriz de '{crit.name}' inconsistente (CR={cr_alt:.3f})"
-                        )
+                        consistency_warnings.append(f"Matriz de '{crit.name}' inconsistente (CR={cr_alt:.3f})")
 
             # --- Puntuaciones globales ---
             global_scores = []
@@ -104,9 +116,21 @@ class ChosenAlernative(QWidget):
                     score_item.setFont(font)
                     name_item.setForeground(Qt.GlobalColor.darkCyan)
                     score_item.setForeground(Qt.GlobalColor.darkCyan)
+                    result_content = result_content + (result_content_str_tableRow_fmt % (alt.name, f"{global_scores[i]:.4f}")) + "  <- Mejor Alternativa\n"
+                else:
+                    result_content = result_content + result_content_str_tableRow_fmt % (alt.name, f"{global_scores[i]:.4f}") + "\n"
+                    
                 table.setItem(i, 0, name_item)
                 table.setItem(i, 1, score_item)
-            table.resizeColumnsToContents()
+
+            # --- Configuración para mostrar la tabla completa sin scroll interno ---
+            table.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+            table.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+            header_height = table.horizontalHeader().height()
+            row_height = table.rowHeight(0) if table.rowCount() > 0 else 0
+            table.setFixedHeight(header_height + table.rowCount() * row_height + 4)
+            # No se estiran columnas horizontalmente
+
             vbox.addWidget(table)
 
             # Si hay advertencias de consistencia, mostrarlas
@@ -117,6 +141,11 @@ class ChosenAlernative(QWidget):
 
             group.setLayout(vbox)
             layout.addWidget(group)
+
+            result_content = result_content + "\n\n"
+
+        # Escribimos resultados 
+        self._model.writeResults(result_content)
 
 
     def _calculate_ci_criteria(self, criteria, sums, weights):

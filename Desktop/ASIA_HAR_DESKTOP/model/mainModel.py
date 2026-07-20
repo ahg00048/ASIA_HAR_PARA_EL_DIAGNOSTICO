@@ -16,6 +16,9 @@ class mainModel():
         self._timeRange = time_tuple[1]
         self._timeInterval = time_tuple[2]
         
+        self._version = 2
+        self._house_id = 2
+
         self._dataFrames = None
         self._task_dfs = None
         self._loadingDFs = False
@@ -77,6 +80,17 @@ class mainModel():
     def saveTime(self):
         dm.save_time(self._timeStart, self._timeRange, self._timeInterval)
 
+# House and version
+
+    def setHouseId(self, house_id):
+        self._house_id = house_id
+
+    def setVersion(self, version):
+        self._version = version
+
+    def writeResults(self, content):
+        dm.write_results(self._version, self._house_id, content)
+
 # Dataframes
     
     def getDataframes(self):
@@ -93,7 +107,7 @@ class mainModel():
     async def _fetchDataframes(self):
         try:
             self._unableToConnectToServer = False
-            self._dataFrames = await dm.retrieveDataExample(self._timeStart, self._timeRange)
+            self._dataFrames = await dm.retrieveDataExample(self._timeStart, self._timeRange, self._house_id, self._version)
         except Exception:
             self._unableToConnectToServer = True
         finally: 

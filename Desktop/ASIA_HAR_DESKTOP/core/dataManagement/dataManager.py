@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import aiohttp
 import aiofiles
+import time
 from zipfile import ZipFile
 
 
@@ -319,15 +320,30 @@ def get_config_dfs_excludedParameters(backup = False):
 
 
 
+#=================================================================
+
+
+def write_results(version: int, house_id: int, content: str):
+    data_path = (OUTPUT_DATA_DIR / OUTPUT_DATA_FORMAT.format(str(version), str(house_id), str(time.time())))
+
+    os.makedirs(os.path.dirname(data_path), exist_ok=True)    
+    try:
+        f = open(data_path, "w")
+    except OSError:
+        return
+    
+    with f:
+        f.write(content)
+
+
 '''
 ========================================================================================
 '''
 
 # Obtiene los datos de ejemplo
-async def retrieveDataExample(time_start, time_range):
-    house_id = 2
-    url = _url_api_root + _url_example + '?house_id={0}&time_start_in_seconds={1}&time_range_in_seconds={2}'
-    url = url.format(house_id, time_start, time_range)
+async def retrieveDataExample(time_start, time_range, house_id, version):
+    url = _url_api_root + _url_example + '?house_id={0}&time_start_in_seconds={1}&time_range_in_seconds={2}&version={3}'
+    url = url.format(house_id, time_start, time_range, version)
 
     # Ahora se espera correctamente el resultado asíncrono
     zip_filename = await retrieveRemoteData_Zip(url, house_id)

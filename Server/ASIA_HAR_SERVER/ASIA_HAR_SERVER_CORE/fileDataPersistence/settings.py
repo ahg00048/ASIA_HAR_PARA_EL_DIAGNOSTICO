@@ -16,6 +16,8 @@ DATASETS = {
 
 DATASETS_TEST = {
     'DIR': BASE_DIR / 'ASIA_HAR_DATASETS_TEST',
+    'V1': 'v1',
+    'V2': 'v2',
     'SUBDIRS_FORMAT': 'house_', # house_{house_id}.extension
     'FILES_FORMAT': [ # data_{house_id}.extension
         'data_',
